@@ -1,0 +1,24 @@
+name: Flutter Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/actions/setup-project
+
+      - name: Build APK
+        run: flutter build apk
+
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: ./.github/actions/setup-project
+
+      - name: Build iOS
+        run: flutter build ios --no-codesign
