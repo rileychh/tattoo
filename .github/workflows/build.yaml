@@ -23,6 +23,18 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Setup Android SDK cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3
+        with:
+          key: ${{ runner.os }}-android-sdk-${{ hashFiles('android/app/build.gradle.kts') }}
+          path: |
+            /usr/local/lib/android/sdk/ndk
+            /usr/local/lib/android/sdk/cmake
+          restore-keys: |
+            ${{ runner.os }}-android-sdk-
 
       - name: Build APK
         run: flutter build apk
