@@ -1,0 +1,25 @@
+name: Setup Project
+description: Read Flutter version, setup Flutter, and get dependencies
+
+outputs:
+  flutter-version:
+    description: 'The Flutter version read from .fvmrc'
+    value: ${{ steps.fvm.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Read Flutter version from .fvmrc
+      id: fvm
+      shell: bash
+      run: echo "version=$(jq -r .flutter .fvmrc)" >> $GITHUB_OUTPUT
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e # v2
+      with:
+        flutter-version: ${{ steps.fvm.outputs.version }}
+        cache: true
+
+    - name: Get dependencies
+      shell: bash
+      run: flutter pub get
