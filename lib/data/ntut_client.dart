@@ -19,7 +19,7 @@ class NtutClient {
 
   NtutClient() {
     // Emulate the NTUT iOS app's HTTP client
-    _ntutAppDio = dio.clone()
+    _ntutAppDio = createDio()
       ..options.baseUrl = 'https://app.ntut.edu.tw'
       ..options.headers = {'User-Agent': 'Direk ios App'};
   }

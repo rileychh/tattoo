@@ -33,28 +33,28 @@ class LenientCookieManager extends CookieManager {
   }
 }
 
-Dio? _dio;
+// Shared CookieJar instance for maintaining session across clients
+CookieJar? _cookieJar;
+CookieJar get cookieJar => _cookieJar ??= CookieJar();
 
-// Global Dio instance with configured interceptors
-Dio get dio {
-  if (_dio != null) return _dio!;
-
-  final cookieJar = CookieJar();
-
-  _dio = Dio()
+// Creates a new Dio instance with configured interceptors
+// Cookies are shared via the global CookieJar
+Dio createDio() {
+  final dio = Dio()
     ..options = BaseOptions(
       validateStatus: (status) => status != null && status < 400,
       followRedirects: false,
-    )
-    ..interceptors.addAll([
-      LenientCookieManager(cookieJar), // Store cookies with lenient parsing
-      HttpsInterceptor(), // Enforce HTTPS
-      RedirectInterceptor(() => _dio!), // Handle redirects within Dio
-      LogInterceptor(
-        responseBody: true,
-        logPrint: (o) => debugPrint(o.toString()),
-      ), // Log requests and responses
-    ]);
+    );
 
-  return _dio!;
+  dio.interceptors.addAll([
+    LenientCookieManager(cookieJar), // Store cookies with lenient parsing
+    HttpsInterceptor(), // Enforce HTTPS
+    RedirectInterceptor(() => dio), // Handle redirects within this Dio instance
+    LogInterceptor(
+      responseBody: true,
+      logPrint: (o) => debugPrint(o.toString()),
+    ), // Log requests and responses
+  ]);
+
+  return dio;
 }
