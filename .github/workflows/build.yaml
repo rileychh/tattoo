@@ -49,19 +49,19 @@ jobs:
       - name: Upload ARM Artifact
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
         with:
-          name: apk-arm-${{ steps.setup.outputs.build-timestamp }}
+          name: apk-arm-${{ github.sha }}
           path: build/app/outputs/flutter-apk/app-armeabi-v7a-debug.apk
 
       - name: Upload ARM64 Artifact
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
         with:
-          name: apk-arm64-${{ steps.setup.outputs.build-timestamp }}
+          name: apk-arm64-${{ github.sha }}
           path: build/app/outputs/flutter-apk/app-arm64-v8a-debug.apk
 
       - name: Upload x64 Artifact
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
         with:
-          name: apk-x64-${{ steps.setup.outputs.build-timestamp }}
+          name: apk-x64-${{ github.sha }}
           path: build/app/outputs/flutter-apk/app-x86_64-debug.apk
 
   build-ios:
@@ -79,5 +79,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
         with:
-          name: ios-${{ steps.setup.outputs.build-timestamp }}
+          name: ios-${{ github.sha }}
           path: build/ios/iphonesimulator/Runner.app
