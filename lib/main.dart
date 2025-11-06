@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:tattoo/data/course_client.dart';
 import 'package:tattoo/data/ntut_client.dart';
 
 void main() {
@@ -31,7 +34,8 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   NtutServiceCode _selectedService = NtutServiceCode.courseService;
-  final NtutClient _client = NtutClient();
+  final NtutClient _ntutClient = NtutClient();
+  final CourseClient _courseClient = CourseClient();
 
   @override
   void dispose() {
@@ -41,12 +45,20 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _login() async {
-    try {
-      await _client.login(_usernameController.text, _passwordController.text);
-      await _client.sso(_selectedService);
-    } catch (e) {
-      debugPrint('Error during login');
-    }
+    await _ntutClient.login(_usernameController.text, _passwordController.text);
+    await _ntutClient.sso(_selectedService);
+
+    final courseTables = await _courseClient.getCourseTableList(
+      _usernameController.text,
+    );
+    inspect('Available course tables: $courseTables');
+
+    final courseSchedule = await _courseClient.getCourseTable(
+      username: _usernameController.text,
+      year: courseTables.first['year'],
+      semester: courseTables.first['semester'],
+    );
+    inspect(courseSchedule);
   }
 
   @override

@@ -38,7 +38,8 @@ dependencies:
   cookie_jar: 4.0.8
   dio_cookie_manager: 3.3.0
   html: 0.15.6
-  dio_redirect_interceptor: ^1.0.1
+  dio_redirect_interceptor: 1.0.1
+  collection: 1.19.1
 
 dev_dependencies:
   flutter_test:
