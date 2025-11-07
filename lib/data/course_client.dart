@@ -8,12 +8,13 @@ class CourseClient {
   late final Dio _courseDio;
 
   CourseClient() {
-    _courseDio = createDio()..options.baseUrl = 'https://aps.ntut.edu.tw';
+    _courseDio = createDio()
+      ..options.baseUrl = 'https://aps.ntut.edu.tw/course/tw/';
   }
 
   Future getCourseTableList(String username) async {
     final response = await _courseDio.post(
-      '/course/tw/Select.jsp',
+      'Select.jsp',
       data: {'code': username, 'format': '-3'},
     );
 
@@ -40,7 +41,7 @@ class CourseClient {
     required int semester,
   }) async {
     final response = await _courseDio.get(
-      '/course/tw/Select.jsp',
+      'Select.jsp',
       queryParameters: {
         'format': '-2',
         'code': username,
