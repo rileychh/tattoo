@@ -13,7 +13,7 @@ class CourseClient {
       ..options.baseUrl = 'https://aps.ntut.edu.tw/course/tw/';
   }
 
-  Future getCourseTableList(String username) async {
+  Future<List<CourseSemester>> getCourseSemesterList(String username) async {
     final response = await _courseDio.post(
       'Select.jsp',
       data: {'code': username, 'format': '-3'},
@@ -29,25 +29,24 @@ class CourseClient {
     // Link format: Select.jsp?format=-2&code=111360109&year=114&sem=1
     return tableLinks.map((link) {
       final queryParams = Uri.parse(link!).queryParameters;
-      return {
-        'year': int.parse(queryParams['year']!),
-        'semester': int.parse(queryParams['sem']!),
-      };
+      return CourseSemester(
+        year: int.parse(queryParams['year']!),
+        semester: int.parse(queryParams['sem']!),
+      );
     }).toList();
   }
 
   Future<List<CourseSchedule>> getCourseTable({
     required String username,
-    required int year,
-    required int semester,
+    required CourseSemester semester,
   }) async {
     final response = await _courseDio.get(
       'Select.jsp',
       queryParameters: {
         'format': '-2',
         'code': username,
-        'year': year,
-        'sem': semester,
+        'year': semester.year,
+        'sem': semester.semester,
       },
     );
 
@@ -131,17 +130,16 @@ class CourseClient {
     throw UnimplementedError();
   }
 
-  Future getTeacher(
-    EntityRef teacher, {
-    required int year,
-    required int semester,
+  Future getTeacher({
+    required EntityRef teacher,
+    required CourseSemester semester,
   }) async {
     await _courseDio.get(
       'Teach.jsp',
       queryParameters: {
         'format': '-3',
-        'year': year,
-        'sem': semester,
+        'year': semester.year,
+        'sem': semester.semester,
         'code': teacher.id,
       },
     );
@@ -149,17 +147,16 @@ class CourseClient {
     throw UnimplementedError();
   }
 
-  Future getClassroom(
-    EntityRef classroom, {
-    required int year,
-    required int semester,
+  Future getClassroom({
+    required EntityRef classroom,
+    required CourseSemester semester,
   }) async {
     await _courseDio.get(
       'Croom.jsp',
       queryParameters: {
         'format': '-3',
-        'year': year,
-        'sem': semester,
+        'year': semester.year,
+        'sem': semester.semester,
         'code': classroom.id,
       },
     );
@@ -167,7 +164,7 @@ class CourseClient {
     throw UnimplementedError();
   }
 
-  Future getSyllabus(String courseNumber, String id) async {
+  Future getSyllabus({required String courseNumber, required String id}) async {
     await _courseDio.get(
       'ShowSyllabus.jsp',
       queryParameters: {'snum': courseNumber, 'code': id},

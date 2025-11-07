@@ -38,6 +38,13 @@ enum CourseType {
   const CourseType(this.code);
 }
 
+class CourseSemester {
+  final int year;
+  final int semester;
+
+  CourseSemester({required this.year, required this.semester});
+}
+
 class EntityRef {
   final String? id;
   final String? name;

@@ -48,15 +48,14 @@ class _MyHomePageState extends State<MyHomePage> {
     await _ntutClient.login(_usernameController.text, _passwordController.text);
     await _ntutClient.sso(_selectedService);
 
-    final courseTables = await _courseClient.getCourseTableList(
+    final semesterList = await _courseClient.getCourseSemesterList(
       _usernameController.text,
     );
-    inspect('Available course tables: $courseTables');
+    inspect(semesterList);
 
     final courseSchedule = await _courseClient.getCourseTable(
       username: _usernameController.text,
-      year: courseTables.first['year'],
-      semester: courseTables.first['semester'],
+      semester: semesterList.first,
     );
     inspect(courseSchedule);
   }
