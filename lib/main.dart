@@ -58,6 +58,13 @@ class _MyHomePageState extends State<MyHomePage> {
       semester: semesterList.first,
     );
     inspect(courseSchedule);
+
+    final course = await _courseClient.getCourse(
+      courseSchedule
+          .firstWhere((schedule) => schedule.course?.id != null)
+          .course!,
+    );
+    inspect(course);
   }
 
   @override

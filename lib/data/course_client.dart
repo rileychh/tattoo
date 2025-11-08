@@ -121,13 +121,43 @@ class CourseClient {
     }).toList();
   }
 
-  Future getCourse(EntityRef course) async {
-    await _courseDio.get(
+  Future<Course> getCourse(EntityRef course) async {
+    final response = await _courseDio.get(
       'Curr.jsp',
       queryParameters: {'format': '-2', 'code': course.id},
     );
 
-    throw UnimplementedError();
+    final document = parse(response.data);
+    final table = document.querySelector('table');
+    if (table == null) {
+      throw Exception('Course details table not found.');
+    }
+
+    final tableRows = table.querySelectorAll('tr');
+
+    // Second row containes id, name, credits, hours
+    final secondRowCells = tableRows[1].children;
+    final id = _parseCellText(secondRowCells[0]);
+    final name = LocalizedString(
+      zh: _parseCellText(secondRowCells[1]),
+      en: _parseCellText(secondRowCells[2]),
+    );
+    final credits = double.tryParse(secondRowCells[3].text.trim());
+    final hours = int.tryParse(secondRowCells[4].text.trim());
+
+    // Second column of the third and fourth rows contain description
+    final description = LocalizedString(
+      zh: _parseCellText(tableRows[2].children[1]),
+      en: _parseCellText(tableRows[3].children[1]),
+    );
+
+    return Course(
+      id: id,
+      name: name,
+      credits: credits,
+      hours: hours,
+      description: description,
+    );
   }
 
   Future getTeacher({

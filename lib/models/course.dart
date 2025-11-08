@@ -1,3 +1,17 @@
+class EntityRef {
+  final String? id;
+  final String? name;
+
+  EntityRef({this.id, this.name});
+}
+
+class LocalizedString {
+  final String? en;
+  final String? zh;
+
+  LocalizedString({this.en, this.zh});
+}
+
 enum DayOfWeek {
   sunday,
   monday,
@@ -45,13 +59,6 @@ class CourseSemester {
   CourseSemester({required this.year, required this.semester});
 }
 
-class EntityRef {
-  final String? id;
-  final String? name;
-
-  EntityRef({this.id, this.name});
-}
-
 class CourseSchedule {
   final String? number;
   final EntityRef? course;
@@ -82,4 +89,14 @@ class CourseSchedule {
     this.syllabusId,
     this.remarks,
   });
+}
+
+class Course {
+  String? id;
+  LocalizedString? name;
+  double? credits;
+  int? hours;
+  LocalizedString? description;
+
+  Course({this.id, this.name, this.credits, this.hours, this.description});
 }
