@@ -1,15 +1,23 @@
-class EntityRef {
-  final String? id;
-  final String? name;
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter/foundation.dart';
 
-  EntityRef({this.id, this.name});
+part 'course.freezed.dart';
+part 'course.g.dart';
+
+@freezed
+abstract class EntityRef with _$EntityRef {
+  const factory EntityRef({String? id, String? name}) = _EntityRef;
+
+  factory EntityRef.fromJson(Map<String, Object?> json) =>
+      _$EntityRefFromJson(json);
 }
 
-class LocalizedString {
-  final String? en;
-  final String? zh;
+@freezed
+abstract class LocalizedString with _$LocalizedString {
+  const factory LocalizedString({String? en, String? zh}) = _LocalizedString;
 
-  LocalizedString({this.en, this.zh});
+  factory LocalizedString.fromJson(Map<String, Object?> json) =>
+      _$LocalizedStringFromJson(json);
 }
 
 enum DayOfWeek {
@@ -52,51 +60,46 @@ enum CourseType {
   const CourseType(this.code);
 }
 
-class CourseSemester {
-  final int year;
-  final int semester;
+@freezed
+abstract class CourseSemester with _$CourseSemester {
+  const factory CourseSemester({required int year, required int semester}) =
+      _CourseSemester;
 
-  CourseSemester({required this.year, required this.semester});
+  factory CourseSemester.fromJson(Map<String, Object?> json) =>
+      _$CourseSemesterFromJson(json);
 }
 
-class CourseSchedule {
-  final String? number;
-  final EntityRef? course;
-  final double? credits;
-  final int? hours;
-  final CourseType? type;
-  final EntityRef? teacher;
-  final List<EntityRef>? classes;
-  final List<(DayOfWeek, Period)>? schedule;
-  final EntityRef? classroom;
-  final String? status;
-  final String? language;
-  final String? syllabusId;
-  final String? remarks;
+@freezed
+abstract class CourseSchedule with _$CourseSchedule {
+  const factory CourseSchedule({
+    String? number,
+    EntityRef? course,
+    double? credits,
+    int? hours,
+    CourseType? type,
+    EntityRef? teacher,
+    List<EntityRef>? classes,
+    List<(DayOfWeek, Period)>? schedule,
+    EntityRef? classroom,
+    String? status,
+    String? language,
+    String? syllabusId,
+    String? remarks,
+  }) = _CourseSchedule;
 
-  CourseSchedule({
-    this.number,
-    this.course,
-    this.credits,
-    this.hours,
-    this.type,
-    this.teacher,
-    this.classes,
-    this.schedule,
-    this.classroom,
-    this.status,
-    this.language,
-    this.syllabusId,
-    this.remarks,
-  });
+  factory CourseSchedule.fromJson(Map<String, Object?> json) =>
+      _$CourseScheduleFromJson(json);
 }
 
-class Course {
-  String? id;
-  LocalizedString? name;
-  double? credits;
-  int? hours;
-  LocalizedString? description;
+@freezed
+abstract class Course with _$Course {
+  const factory Course({
+    String? id,
+    LocalizedString? name,
+    double? credits,
+    int? hours,
+    LocalizedString? description,
+  }) = _Course;
 
-  Course({this.id, this.name, this.credits, this.hours, this.description});
+  factory Course.fromJson(Map<String, Object?> json) => _$CourseFromJson(json);
 }

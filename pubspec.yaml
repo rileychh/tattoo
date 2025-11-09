@@ -40,6 +40,8 @@ dependencies:
   html: 0.15.6
   dio_redirect_interceptor: 1.0.1
   collection: 1.19.1
+  freezed_annotation: 3.1.0
+  json_annotation: 4.9.0
 
 dev_dependencies:
   flutter_test:
@@ -51,6 +53,11 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: 6.0.0
+  build_runner: 2.10.1
+  freezed: 3.2.3
+  json_serializable: 6.11.1
+  custom_lint: 0.8.1
+  freezed_lint: 0.0.12
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
