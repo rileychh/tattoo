@@ -45,6 +45,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _login() async {
+    Stopwatch stopwatch = Stopwatch()..start();
+
     await _ntutClient.login(_usernameController.text, _passwordController.text);
     await _ntutClient.sso(_selectedService);
 
@@ -65,6 +67,9 @@ class _MyHomePageState extends State<MyHomePage> {
           .course!,
     );
     inspect(course);
+
+    stopwatch.stop();
+    log('Completed in ${stopwatch.elapsedMilliseconds} ms');
   }
 
   @override
