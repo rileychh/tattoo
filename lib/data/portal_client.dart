@@ -7,19 +7,19 @@ import 'package:tattoo/models/user.dart';
 import 'package:tattoo/utils/http.dart';
 
 // Identification codes for NTUT services used in SSO
-enum NtutServiceCode {
+enum PortalServiceCode {
   scoreService('aa_003_LB_oauth'),
   courseService('aa_0010-oauth'),
   iSchoolPlusService('ischool_plus_oauth');
 
   final String code;
-  const NtutServiceCode(this.code);
+  const PortalServiceCode(this.code);
 }
 
-class NtutClient {
+class PortalClient {
   late final Dio _ntutAppDio;
 
-  NtutClient() {
+  PortalClient() {
     // Emulate the NTUT iOS app's HTTP client
     _ntutAppDio = createDio()
       ..options.baseUrl = 'https://app.ntut.edu.tw'
@@ -62,7 +62,7 @@ class NtutClient {
   }
 
   // Perform SSO and set cookies for the target service
-  Future<void> sso(NtutServiceCode serviceCode) async {
+  Future<void> sso(PortalServiceCode serviceCode) async {
     // Fetch a self-submitting SSO form
     final response = await _ntutAppDio.get(
       '/ssoIndex.do',

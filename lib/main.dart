@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:tattoo/data/course_client.dart';
-import 'package:tattoo/data/ntut_client.dart';
+import 'package:tattoo/data/portal_client.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,8 +33,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  NtutServiceCode _selectedService = NtutServiceCode.courseService;
-  final NtutClient _ntutClient = NtutClient();
+  var _selectedService = PortalServiceCode.courseService;
+  final PortalClient _portalClient = PortalClient();
   final CourseClient _courseClient = CourseClient();
 
   @override
@@ -47,8 +47,13 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _login() async {
     Stopwatch stopwatch = Stopwatch()..start();
 
-    await _ntutClient.login(_usernameController.text, _passwordController.text);
-    await _ntutClient.sso(_selectedService);
+    final user = await _portalClient.login(
+      _usernameController.text,
+      _passwordController.text,
+    );
+    inspect(user);
+
+    await _portalClient.sso(_selectedService);
 
     final semesterList = await _courseClient.getCourseSemesterList(
       _usernameController.text,
@@ -104,8 +109,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   autofillHints: const [AutofillHints.password],
                   obscureText: true,
                 ),
-                DropdownMenu<NtutServiceCode>(
-                  initialSelection: NtutServiceCode.courseService,
+                DropdownMenu<PortalServiceCode>(
+                  initialSelection: PortalServiceCode.courseService,
                   onSelected: (value) {
                     if (value == null) return;
                     setState(() {
@@ -113,7 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     });
                   },
                   dropdownMenuEntries: [
-                    for (final service in NtutServiceCode.values)
+                    for (final service in PortalServiceCode.values)
                       DropdownMenuEntry(value: service, label: service.name),
                   ],
                 ),
