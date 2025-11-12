@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
@@ -49,6 +50,15 @@ class NtutClient {
     final response = await _ntutAppDio.get('/sessionCheckApp.do');
     final body = jsonDecode(response.data);
     return body["success"] == true;
+  }
+
+  Future<Uint8List> getAvatar(String filename) async {
+    final response = await _ntutAppDio.get(
+      '/photoView.do',
+      queryParameters: {'realname': filename},
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return response.data;
   }
 
   // Perform SSO and set cookies for the target service
