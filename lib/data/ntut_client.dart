@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
+import 'package:tattoo/models/user.dart';
 import 'package:tattoo/utils/http.dart';
 
 // Identification codes for NTUT services used in SSO
@@ -25,8 +26,8 @@ class NtutClient {
   }
 
   // Sets the JSESSIONID cookie in app.ntut.edu.tw domain
-  Future<void> login(String username, String password) async {
-    await _ntutAppDio.post(
+  Future<User> login(String username, String password) async {
+    final response = await _ntutAppDio.post(
       '/login.do',
       queryParameters: {'muid': username, 'mpassword': password},
     );
@@ -34,6 +35,14 @@ class NtutClient {
     if (!await isLoggedIn()) {
       throw Exception('Login failed. Please check your credentials.');
     }
+
+    final body = jsonDecode(response.data);
+    return User(
+      name: body['givenName'],
+      avatarFilename: body['userPhoto'],
+      email: body['userMail'],
+      isPasswordExpired: body['passwordExpiredRemind'] != null,
+    );
   }
 
   Future<bool> isLoggedIn() async {
