@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:tattoo/data/course_client.dart';
+import 'package:tattoo/data/i_school_plus_client.dart';
 import 'package:tattoo/data/portal_client.dart';
 
 void main() {
@@ -34,8 +35,9 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   var _selectedService = PortalServiceCode.courseService;
-  final PortalClient _portalClient = PortalClient();
-  final CourseClient _courseClient = CourseClient();
+  final _portalClient = PortalClient();
+  final _courseClient = CourseClient();
+  final _iSchoolPlusClient = ISchoolPlusClient();
 
   @override
   void dispose() {
@@ -55,23 +57,48 @@ class _MyHomePageState extends State<MyHomePage> {
 
     await _portalClient.sso(_selectedService);
 
-    final semesterList = await _courseClient.getCourseSemesterList(
-      _usernameController.text,
-    );
-    inspect(semesterList);
+    switch (_selectedService) {
+      case PortalServiceCode.courseService:
+        final semesterList = await _courseClient.getCourseSemesterList(
+          _usernameController.text,
+        );
+        inspect(semesterList);
 
-    final courseSchedule = await _courseClient.getCourseTable(
-      username: _usernameController.text,
-      semester: semesterList.first,
-    );
-    inspect(courseSchedule);
+        final courseSchedule = await _courseClient.getCourseTable(
+          username: _usernameController.text,
+          semester: semesterList.first,
+        );
+        inspect(courseSchedule);
 
-    final course = await _courseClient.getCourse(
-      courseSchedule
-          .firstWhere((schedule) => schedule.course?.id != null)
-          .course!,
-    );
-    inspect(course);
+        final course = await _courseClient.getCourse(
+          courseSchedule
+              .firstWhere((schedule) => schedule.course?.id != null)
+              .course!,
+        );
+        inspect(course);
+        break;
+      case PortalServiceCode.iSchoolPlusService:
+        await _portalClient.sso(PortalServiceCode.courseService);
+
+        final semesterList = await _courseClient.getCourseSemesterList(
+          _usernameController.text,
+        );
+
+        final courseSchedule = await _courseClient.getCourseTable(
+          username: _usernameController.text,
+          semester: semesterList.first,
+        );
+
+        final courseNumber = courseSchedule
+            .firstWhere((course) => course.number != null)
+            .number!;
+
+        final students = await _iSchoolPlusClient.getStudents(courseNumber);
+        inspect(students);
+        break;
+      default:
+        break;
+    }
 
     stopwatch.stop();
     log('Completed in ${stopwatch.elapsedMilliseconds} ms');
