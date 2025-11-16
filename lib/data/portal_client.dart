@@ -85,6 +85,11 @@ class PortalClient {
           input.attributes['name']!: input.attributes['value'] ?? '',
     };
 
+    // Prepend the invalid cookie filter interceptor for i-School Plus SSO
+    if (serviceCode == PortalServiceCode.iSchoolPlusService) {
+      _ntutAppDio.interceptors.insert(0, InvalidCookieFilter());
+    }
+
     // Submit the SSO form and follow redirects
     // Sets the necessary cookies for the target service
     await _ntutAppDio.post(

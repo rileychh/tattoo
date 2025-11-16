@@ -62,7 +62,6 @@ Dio createDio() {
     );
 
   dio.interceptors.addAll([
-    InvalidCookieFilter(), // Filter invalid Set-Cookie headers
     CookieManager(cookieJar), // Store cookies
     HttpsInterceptor(), // Enforce HTTPS
     RedirectInterceptor(() => dio), // Handle redirects within this Dio instance
