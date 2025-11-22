@@ -10,12 +10,12 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
   name: json['name'] as String?,
   avatarFilename: json['avatarFilename'] as String?,
   email: json['email'] as String?,
-  isPasswordExpired: json['isPasswordExpired'] as bool?,
+  passwordExpiresInDays: (json['passwordExpiresInDays'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
   'name': instance.name,
   'avatarFilename': instance.avatarFilename,
   'email': instance.email,
-  'isPasswordExpired': instance.isPasswordExpired,
+  'passwordExpiresInDays': instance.passwordExpiresInDays,
 };

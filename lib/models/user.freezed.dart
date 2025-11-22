@@ -15,7 +15,15 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$User {
 
- String? get name; String? get avatarFilename; String? get email; bool? get isPasswordExpired;
+/// User's display name from NTUT Portal (givenName).
+ String? get name;/// Filename of the user's profile photo (e.g., "111360109_temp1714460935341.jpeg").
+ String? get avatarFilename;/// User's NTUT email address (e.g., "t111360109@ntut.edu.tw").
+ String? get email;/// Number of days until the password expires.
+///
+/// When non-null, indicates the user should change their password soon.
+/// The value corresponds to the `passwordExpiredRemind` field from the login API.
+/// Null if there is no expiration warning.
+ int? get passwordExpiresInDays;
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +36,16 @@ $UserCopyWith<User> get copyWith => _$UserCopyWithImpl<User>(this as User, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.name, name) || other.name == name)&&(identical(other.avatarFilename, avatarFilename) || other.avatarFilename == avatarFilename)&&(identical(other.email, email) || other.email == email)&&(identical(other.isPasswordExpired, isPasswordExpired) || other.isPasswordExpired == isPasswordExpired));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.name, name) || other.name == name)&&(identical(other.avatarFilename, avatarFilename) || other.avatarFilename == avatarFilename)&&(identical(other.email, email) || other.email == email)&&(identical(other.passwordExpiresInDays, passwordExpiresInDays) || other.passwordExpiresInDays == passwordExpiresInDays));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,avatarFilename,email,isPasswordExpired);
+int get hashCode => Object.hash(runtimeType,name,avatarFilename,email,passwordExpiresInDays);
 
 @override
 String toString() {
-  return 'User(name: $name, avatarFilename: $avatarFilename, email: $email, isPasswordExpired: $isPasswordExpired)';
+  return 'User(name: $name, avatarFilename: $avatarFilename, email: $email, passwordExpiresInDays: $passwordExpiresInDays)';
 }
 
 
@@ -48,7 +56,7 @@ abstract mixin class $UserCopyWith<$Res>  {
   factory $UserCopyWith(User value, $Res Function(User) _then) = _$UserCopyWithImpl;
 @useResult
 $Res call({
- String? name, String? avatarFilename, String? email, bool? isPasswordExpired
+ String? name, String? avatarFilename, String? email, int? passwordExpiresInDays
 });
 
 
@@ -65,13 +73,13 @@ class _$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = freezed,Object? avatarFilename = freezed,Object? email = freezed,Object? isPasswordExpired = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? name = freezed,Object? avatarFilename = freezed,Object? email = freezed,Object? passwordExpiresInDays = freezed,}) {
   return _then(_self.copyWith(
 name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,avatarFilename: freezed == avatarFilename ? _self.avatarFilename : avatarFilename // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String?,isPasswordExpired: freezed == isPasswordExpired ? _self.isPasswordExpired : isPasswordExpired // ignore: cast_nullable_to_non_nullable
-as bool?,
+as String?,passwordExpiresInDays: freezed == passwordExpiresInDays ? _self.passwordExpiresInDays : passwordExpiresInDays // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -156,10 +164,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? name,  String? avatarFilename,  String? email,  bool? isPasswordExpired)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? name,  String? avatarFilename,  String? email,  int? passwordExpiresInDays)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _User() when $default != null:
-return $default(_that.name,_that.avatarFilename,_that.email,_that.isPasswordExpired);case _:
+return $default(_that.name,_that.avatarFilename,_that.email,_that.passwordExpiresInDays);case _:
   return orElse();
 
 }
@@ -177,10 +185,10 @@ return $default(_that.name,_that.avatarFilename,_that.email,_that.isPasswordExpi
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? name,  String? avatarFilename,  String? email,  bool? isPasswordExpired)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? name,  String? avatarFilename,  String? email,  int? passwordExpiresInDays)  $default,) {final _that = this;
 switch (_that) {
 case _User():
-return $default(_that.name,_that.avatarFilename,_that.email,_that.isPasswordExpired);case _:
+return $default(_that.name,_that.avatarFilename,_that.email,_that.passwordExpiresInDays);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +205,10 @@ return $default(_that.name,_that.avatarFilename,_that.email,_that.isPasswordExpi
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? name,  String? avatarFilename,  String? email,  bool? isPasswordExpired)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? name,  String? avatarFilename,  String? email,  int? passwordExpiresInDays)?  $default,) {final _that = this;
 switch (_that) {
 case _User() when $default != null:
-return $default(_that.name,_that.avatarFilename,_that.email,_that.isPasswordExpired);case _:
+return $default(_that.name,_that.avatarFilename,_that.email,_that.passwordExpiresInDays);case _:
   return null;
 
 }
@@ -212,13 +220,21 @@ return $default(_that.name,_that.avatarFilename,_that.email,_that.isPasswordExpi
 @JsonSerializable()
 
 class _User implements User {
-  const _User({this.name, this.avatarFilename, this.email, this.isPasswordExpired});
+  const _User({this.name, this.avatarFilename, this.email, this.passwordExpiresInDays});
   factory _User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
+/// User's display name from NTUT Portal (givenName).
 @override final  String? name;
+/// Filename of the user's profile photo (e.g., "111360109_temp1714460935341.jpeg").
 @override final  String? avatarFilename;
+/// User's NTUT email address (e.g., "t111360109@ntut.edu.tw").
 @override final  String? email;
-@override final  bool? isPasswordExpired;
+/// Number of days until the password expires.
+///
+/// When non-null, indicates the user should change their password soon.
+/// The value corresponds to the `passwordExpiredRemind` field from the login API.
+/// Null if there is no expiration warning.
+@override final  int? passwordExpiresInDays;
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
@@ -233,16 +249,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _User&&(identical(other.name, name) || other.name == name)&&(identical(other.avatarFilename, avatarFilename) || other.avatarFilename == avatarFilename)&&(identical(other.email, email) || other.email == email)&&(identical(other.isPasswordExpired, isPasswordExpired) || other.isPasswordExpired == isPasswordExpired));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _User&&(identical(other.name, name) || other.name == name)&&(identical(other.avatarFilename, avatarFilename) || other.avatarFilename == avatarFilename)&&(identical(other.email, email) || other.email == email)&&(identical(other.passwordExpiresInDays, passwordExpiresInDays) || other.passwordExpiresInDays == passwordExpiresInDays));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,avatarFilename,email,isPasswordExpired);
+int get hashCode => Object.hash(runtimeType,name,avatarFilename,email,passwordExpiresInDays);
 
 @override
 String toString() {
-  return 'User(name: $name, avatarFilename: $avatarFilename, email: $email, isPasswordExpired: $isPasswordExpired)';
+  return 'User(name: $name, avatarFilename: $avatarFilename, email: $email, passwordExpiresInDays: $passwordExpiresInDays)';
 }
 
 
@@ -253,7 +269,7 @@ abstract mixin class _$UserCopyWith<$Res> implements $UserCopyWith<$Res> {
   factory _$UserCopyWith(_User value, $Res Function(_User) _then) = __$UserCopyWithImpl;
 @override @useResult
 $Res call({
- String? name, String? avatarFilename, String? email, bool? isPasswordExpired
+ String? name, String? avatarFilename, String? email, int? passwordExpiresInDays
 });
 
 
@@ -270,13 +286,13 @@ class __$UserCopyWithImpl<$Res>
 
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = freezed,Object? avatarFilename = freezed,Object? email = freezed,Object? isPasswordExpired = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? name = freezed,Object? avatarFilename = freezed,Object? email = freezed,Object? passwordExpiresInDays = freezed,}) {
   return _then(_User(
 name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,avatarFilename: freezed == avatarFilename ? _self.avatarFilename : avatarFilename // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String?,isPasswordExpired: freezed == isPasswordExpired ? _self.isPasswordExpired : isPasswordExpired // ignore: cast_nullable_to_non_nullable
-as bool?,
+as String?,passwordExpiresInDays: freezed == passwordExpiresInDays ? _self.passwordExpiresInDays : passwordExpiresInDays // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 

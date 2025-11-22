@@ -38,11 +38,15 @@ class PortalClient {
     }
 
     final body = jsonDecode(response.data);
+    final String? passwordExpiredRemind = body['passwordExpiredRemind'];
+
     return User(
       name: body['givenName'],
       avatarFilename: body['userPhoto'],
       email: body['userMail'],
-      isPasswordExpired: body['passwordExpiredRemind'] != null,
+      passwordExpiresInDays: passwordExpiredRemind != null
+          ? int.tryParse(passwordExpiredRemind)
+          : null,
     );
   }
 
