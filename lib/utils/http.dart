@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
@@ -5,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_redirect_interceptor/dio_redirect_interceptor.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 
 // Interceptor to convert HTTP requests to HTTPS
 class HttpsInterceptor extends Interceptor {
@@ -48,6 +50,49 @@ class InvalidCookieFilter extends Interceptor {
   }
 }
 
+/// One-line log [Interceptor] for requests and responses.
+class LogInterceptor extends Interceptor {
+  @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    final method = response.requestOptions.method;
+    final uri = response.requestOptions.uri;
+    final parameters = response.requestOptions.queryParameters.length;
+    final body = response.requestOptions.data.toString();
+
+    final requestLog = [
+      method,
+      "${uri.origin}${uri.path}",
+      if (parameters > 0) "$parameters param${parameters != 1 ? 's' : ''}",
+      if (body.isNotEmpty)
+        "${NumberFormat.compact().format(body.length)}B body",
+      if (body is List || body is Map) 'body',
+    ].join(' ');
+
+    final statusCode = response.statusCode;
+    final contentType = response.headers
+        .value(HttpHeaders.contentTypeHeader)
+        ?.split(';')
+        .first;
+    final contentLength =
+        int.tryParse(
+          response.headers.value(HttpHeaders.contentLengthHeader) ?? '',
+        ) ??
+        response.data.length ??
+        0;
+    final cookies = response.headers[HttpHeaders.setCookieHeader]?.length ?? 0;
+
+    final responseLog = [
+      statusCode,
+      if (contentType != null) contentType,
+      if (contentLength > 0) '${NumberFormat.compact().format(contentLength)}B',
+      if (cookies > 0) "$cookies cookie${cookies != 1 ? 's' : ''}",
+    ].join(' ');
+
+    log("$requestLog => $responseLog");
+    handler.next(response);
+  }
+}
+
 // Shared CookieJar instance for maintaining session across clients
 CookieJar? _cookieJar;
 CookieJar get cookieJar => _cookieJar ??= CookieJar();
@@ -65,9 +110,7 @@ Dio createDio() {
     CookieManager(cookieJar), // Store cookies
     HttpsInterceptor(), // Enforce HTTPS
     RedirectInterceptor(() => dio), // Handle redirects within this Dio instance
-    LogInterceptor(
-      logPrint: (o) => debugPrint(o.toString()),
-    ), // Log requests and responses
+    LogInterceptor(), // Log requests and responses
   ]);
 
   return dio;
