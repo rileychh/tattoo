@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:dio_redirect_interceptor/dio_redirect_interceptor.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
@@ -93,18 +94,32 @@ class LogInterceptor extends Interceptor {
   }
 }
 
-// Shared CookieJar instance for maintaining session across clients
 CookieJar? _cookieJar;
+
+/// Shared CookieJar instance for maintaining session across clients.
 CookieJar get cookieJar => _cookieJar ??= CookieJar();
 
-// Creates a new Dio instance with configured interceptors
-// Cookies are shared via the global CookieJar
+/// Creates a new Dio instance with configured interceptors.
+///
+/// To debug with a self-signed certificate, pass
+/// --dart-define=ALLOW_BAD_CERTIFICATES=true to flutter run.
+///
+/// Cookies are shared across all clients via the global [cookieJar].
 Dio createDio() {
   final dio = Dio()
     ..options = BaseOptions(
       validateStatus: (status) => status != null && status < 400,
       followRedirects: false,
     );
+
+  const allowBadCertificates = bool.fromEnvironment('ALLOW_BAD_CERTIFICATES');
+  if (allowBadCertificates) {
+    dio.httpClientAdapter = IOHttpClientAdapter(
+      createHttpClient: () => HttpClient()
+        ..badCertificateCallback =
+            (X509Certificate cert, String host, int port) => true,
+    );
+  }
 
   dio.interceptors.addAll([
     CookieManager(cookieJar), // Store cookies
