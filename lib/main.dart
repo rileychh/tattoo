@@ -78,30 +78,26 @@ class _MyHomePageState extends State<MyHomePage> {
         inspect(course);
         break;
       case PortalServiceCode.iSchoolPlusService:
-        await _portalClient.sso(PortalServiceCode.courseService);
+        // Open-Source System Software and Practice
+        const courseNumber = "340689";
+        final materials = await _iSchoolPlusClient.getMaterials(courseNumber);
 
-        final semesterList = await _courseClient.getCourseSemesterList(
-          _usernameController.text,
+        final redirectMaterial = await _iSchoolPlusClient.getMaterial(
+          materials[0],
         );
+        inspect(redirectMaterial);
 
-        final courseSchedule = await _courseClient.getCourseTable(
-          username: _usernameController.text,
-          semester: semesterList.first,
-        );
+        final pdfMaterial = await _iSchoolPlusClient.getMaterial(materials[1]);
+        inspect(pdfMaterial);
 
-        final courses = courseSchedule.where((course) => course.number != null);
-        inspect(courses);
-
-        final students = await _iSchoolPlusClient.getStudents(
-          courses.first.number!,
-        );
-        inspect(students);
-
-        for (final course in courses) {
-          final files = await _iSchoolPlusClient.getMaterials(course.number!);
-          if (files.isEmpty) continue;
-          inspect(files);
-          break;
+        // Course recording materials are unimplemented
+        try {
+          final courseRecordingMaterial = await _iSchoolPlusClient.getMaterial(
+            materials.last,
+          );
+          inspect(courseRecordingMaterial);
+        } catch (e) {
+          inspect(e.toString());
         }
         break;
       default:
