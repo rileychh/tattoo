@@ -92,6 +92,7 @@ class PortalClient {
     // Prepend the invalid cookie filter interceptor for i-School Plus SSO
     if (serviceCode == PortalServiceCode.iSchoolPlusService) {
       _portalDio.interceptors.insert(0, InvalidCookieFilter());
+      _portalDio.transformer = PlainTextTransformer();
     }
 
     // Submit the SSO form and follow redirects

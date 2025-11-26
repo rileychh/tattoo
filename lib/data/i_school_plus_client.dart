@@ -18,7 +18,8 @@ class ISchoolPlusClient {
   ISchoolPlusClient() {
     _iSchoolPlusDio = createDio()
       ..options.baseUrl = 'https://istudy.ntut.edu.tw/learn/'
-      ..interceptors.insert(0, InvalidCookieFilter()); // Prepend cookie filter
+      ..interceptors.insert(0, InvalidCookieFilter()) // Prepend cookie filter
+      ..transformer = PlainTextTransformer();
   }
 
   Future<void> _selectCourse(String courseNumber) async {

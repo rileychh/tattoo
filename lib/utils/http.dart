@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -8,6 +9,8 @@ import 'package:dio_redirect_interceptor/dio_redirect_interceptor.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
+// ignore: implementation_imports
+import 'package:dio/src/transformers/util/consolidate_bytes.dart';
 
 // Interceptor to convert HTTP requests to HTTPS
 class HttpsInterceptor extends Interceptor {
@@ -48,6 +51,33 @@ class InvalidCookieFilter extends Interceptor {
     response.headers.set(HttpHeaders.setCookieHeader, validCookies);
 
     handler.next(response);
+  }
+}
+
+/// Minimal [Transformer] that skips JSON parsing and Content-Type validation.
+///
+/// The i-School Plus service return HTML/XML and send malformed Content-Type headers
+/// like "text/html;;charset=UTF-8" which cause MediaType.parse() to fail.
+/// This transformer bypasses all JSON/MIME type handling and returns raw strings.
+class PlainTextTransformer extends BackgroundTransformer {
+  @override
+  Future transformResponse(
+    RequestOptions options,
+    ResponseBody responseBody,
+  ) async {
+    // Return streams and bytes as-is
+    if (options.responseType == ResponseType.stream) {
+      return responseBody;
+    }
+
+    final responseBytes = await consolidateBytes(responseBody.stream);
+
+    if (options.responseType == ResponseType.bytes) {
+      return responseBytes;
+    }
+
+    // Always decode as string, no JSON parsing
+    return utf8.decode(responseBytes, allowMalformed: true);
   }
 }
 
