@@ -11,7 +11,7 @@ import 'package:intl/intl.dart';
 // ignore: implementation_imports
 import 'package:dio/src/transformers/util/consolidate_bytes.dart';
 
-// Interceptor to convert HTTP requests to HTTPS
+/// [Interceptor] to convert HTTP requests to HTTPS.
 class HttpsInterceptor extends Interceptor {
   HttpsInterceptor();
 
@@ -25,9 +25,9 @@ class HttpsInterceptor extends Interceptor {
   }
 }
 
-/// Interceptor to filter out invalid Set-Cookie headers from responses.
+/// [Interceptor] to filter out invalid Set-Cookie headers from responses.
 ///
-/// The i-School Plus service sets cookies with invalid names, causing parsing errors.
+/// [ISchoolPlusClient] sets cookies with invalid names, causing parsing errors.
 class InvalidCookieFilter extends Interceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
@@ -55,7 +55,7 @@ class InvalidCookieFilter extends Interceptor {
 
 /// Minimal [Transformer] that skips JSON parsing and Content-Type validation.
 ///
-/// The i-School Plus service return HTML/XML and send malformed Content-Type headers
+/// [ISchoolPlusClient] return HTML/XML and send malformed Content-Type headers
 /// like "text/html;;charset=UTF-8" which cause MediaType.parse() to fail.
 /// This transformer bypasses all JSON/MIME type handling and returns raw strings.
 class PlainTextTransformer extends BackgroundTransformer {
