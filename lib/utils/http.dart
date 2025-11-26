@@ -7,7 +7,6 @@ import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_redirect_interceptor/dio_redirect_interceptor.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 // ignore: implementation_imports
 import 'package:dio/src/transformers/util/consolidate_bytes.dart';
@@ -45,7 +44,7 @@ class InvalidCookieFilter extends Interceptor {
         validCookies.add(header);
       } on FormatException {
         // Ignore invalid cookie
-        debugPrint('Filtered invalid Set-Cookie header: $header');
+        log('Filtered invalid Set-Cookie header: $header', name: 'HTTP');
       }
     }
     response.headers.set(HttpHeaders.setCookieHeader, validCookies);
@@ -88,15 +87,14 @@ class LogInterceptor extends Interceptor {
     final method = response.requestOptions.method;
     final uri = response.requestOptions.uri;
     final parameters = response.requestOptions.queryParameters.length;
-    final body = response.requestOptions.data.toString();
+    final bodyLength = response.requestOptions.data?.length;
 
     final requestLog = [
       method,
       "${uri.origin}${uri.path}",
       if (parameters > 0) "$parameters param${parameters != 1 ? 's' : ''}",
-      if (body.isNotEmpty)
-        "${NumberFormat.compact().format(body.length)}B body",
-      if (body is List || body is Map) 'body',
+      if (bodyLength is int)
+        "${NumberFormat.compact().format(bodyLength)}B body",
     ].join(' ');
 
     final statusCode = response.statusCode;
@@ -119,7 +117,7 @@ class LogInterceptor extends Interceptor {
       if (cookies > 0) "$cookies cookie${cookies != 1 ? 's' : ''}",
     ].join(' ');
 
-    log("$requestLog => $responseLog");
+    log("$requestLog => $responseLog", name: 'HTTP');
     handler.next(response);
   }
 }
