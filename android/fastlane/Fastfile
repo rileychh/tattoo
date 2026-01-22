@@ -16,23 +16,39 @@
 default_platform(:android)
 
 platform :android do
-  desc "Runs all the tests"
-  lane :test do
-    gradle(task: "test")
+  # Shared keystore configuration
+  def keystore_config
+    {
+      git_url: ENV["MATCH_KEYSTORE_GIT_URL"],
+      package_name: "club.ntut.tattoo",
+      match_secret: ENV["MATCH_KEYSTORE_SECRET"]
+    }
   end
 
-  desc "Submit a new Beta Build to Crashlytics Beta"
-  lane :beta do
-    gradle(task: "clean assembleRelease")
-    crashlytics
-  
-    # sh "your_script.sh"
-    # You can also use other beta testing services here
+  desc "Build and sign release APK"
+  lane :build_apk do
+    Dir.chdir("../..") do
+      sh("flutter", "build", "apk", "--release", "--split-per-abi")
+    end
+
+    # Sign each split APK
+    ["armeabi-v7a", "arm64-v8a", "x86_64"].each do |abi|
+      match_keystore(
+        **keystore_config,
+        apk_path: "../build/app/outputs/flutter-apk/app-#{abi}-release.apk"
+      )
+    end
   end
 
-  desc "Deploy a new version to the Google Play"
-  lane :deploy do
-    gradle(task: "clean assembleRelease")
-    upload_to_play_store
+  desc "Build and sign release AAB"
+  lane :build_aab do
+    Dir.chdir("../..") do
+      sh("flutter", "build", "appbundle", "--release")
+    end
+
+    match_keystore(
+      **keystore_config,
+      aab_path: "../build/app/outputs/bundle/release/app-release.aab"
+    )
   end
 end
