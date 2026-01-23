@@ -12,9 +12,3 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
-
-# Environment variables
-.env
-
-# Fastlane execution reports (machine-specific, regenerated each run)
-fastlane/report.xml
