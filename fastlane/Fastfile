@@ -15,6 +15,38 @@
 
 default_platform(:android)
 
+platform :ios do
+  desc "Build and sign release IPA"
+  lane :build_ipa do
+    setup_ci if is_ci
+
+    match(
+      type: "development",
+      app_identifier: "club.ntut.tattoo",
+      git_url: ENV["SIGNING_GIT_URL"],
+      readonly: true
+    )
+
+    Dir.chdir("..") do
+      sh("flutter", "build", "ios", "--release", "--no-codesign")
+    end
+
+    build_app(
+      workspace: "ios/Runner.xcworkspace",
+      scheme: "Runner",
+      configuration: "Release",
+      export_method: "development",
+      export_options: {
+        provisioningProfiles: {
+          "club.ntut.tattoo" => "match Development club.ntut.tattoo"
+        }
+      },
+      output_directory: "build/ios/ipa",
+      output_name: "tattoo.ipa"
+    )
+  end
+end
+
 platform :android do
   # Shared keystore configuration
   def keystore_config
@@ -27,7 +59,7 @@ platform :android do
 
   desc "Build and sign release APK"
   lane :build_apk do
-    Dir.chdir("../..") do
+    Dir.chdir("..") do
       sh("flutter", "build", "apk", "--release", "--split-per-abi")
     end
 
@@ -35,20 +67,20 @@ platform :android do
     ["armeabi-v7a", "arm64-v8a", "x86_64"].each do |abi|
       match_keystore(
         **keystore_config,
-        apk_path: "../build/app/outputs/flutter-apk/app-#{abi}-release.apk"
+        apk_path: "build/app/outputs/flutter-apk/app-#{abi}-release.apk"
       )
     end
   end
 
   desc "Build and sign release AAB"
   lane :build_aab do
-    Dir.chdir("../..") do
+    Dir.chdir("..") do
       sh("flutter", "build", "appbundle", "--release")
     end
 
     match_keystore(
       **keystore_config,
-      aab_path: "../build/app/outputs/bundle/release/app-release.aab"
+      aab_path: "build/app/outputs/bundle/release/app-release.aab"
     )
   end
 end
