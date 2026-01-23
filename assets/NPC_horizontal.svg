@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 24.2.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   version="1.1"
+   id="圖層_1"
+   x="0px"
+   y="0px"
+   viewBox="0 0 506.40799 122.891"
+   xml:space="preserve"
+   sodipodi:docname="NPC horizontal(1).svg"
+   width="506.40799"
+   height="122.891"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:i="&amp;#38;ns_ai;"><defs
+   id="defs1">
+	
+	
+
+		
+	</defs><sodipodi:namedview
+   id="namedview1"
+   pagecolor="#505050"
+   bordercolor="#ffffff"
+   borderopacity="1"
+   inkscape:showpageshadow="0"
+   inkscape:pageopacity="0"
+   inkscape:pagecheckerboard="1"
+   inkscape:deskcolor="#d1d1d1"
+   inkscape:zoom="1"
+   inkscape:cx="330"
+   inkscape:cy="126"
+   inkscape:window-width="1920"
+   inkscape:window-height="1008"
+   inkscape:window-x="0"
+   inkscape:window-y="0"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="圖層_1"
+   showgrid="true"><inkscape:grid
+     id="grid1"
+     units="px"
+     originx="-166.79604"
+     originy="-118.55469"
+     spacingx="1"
+     spacingy="1"
+     empcolor="#0099e5"
+     empopacity="0.30196078"
+     color="#0099e5"
+     opacity="0.14901961"
+     empspacing="5"
+     dotted="false"
+     gridanglex="30"
+     gridanglez="30"
+     visible="true" /></sodipodi:namedview>
+<path
+   d="m 429.80598,22.890809 h -80 v 80.000001 h 80 V 76.224149 h -53.33333 v -26.66667 h 53.33333 z"
+   id="path8"
+   style="stroke-width:0.416667;fill:#000000" /><path
+   d="m 239.87065,102.89081 26.66667,-53.333331 h 26.66667 v 26.66667 h -26.66667 v 26.666661 h 53.33334 V 22.890809 h -80.00001 z"
+   id="path7"
+   style="stroke-width:0.416667;fill:#000000" /><path
+   d="m 129.93534,102.89081 h 26.66667 V 49.557479 h 26.66666 v 53.333331 h 26.66667 V 22.890809 h -80 z"
+   id="path6"
+   style="stroke-width:0.416667;fill:#000000" /><path
+   d="M 459.7413,102.89081 V 76.224149 h 26.66667 v 26.666661 z"
+   id="path5"
+   style="stroke-width:0.416667;fill:#000000" /><path
+   d="M 20.00002,20.000189 V 100.00018 L 46.66669,73.333519 100.00002,100.00018 V 20.000189 l -26.66667,26.66666 z"
+   id="path1"
+   style="stroke-width:0.104167;fill:#000000" />
+</svg>

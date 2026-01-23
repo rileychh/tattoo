@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:tattoo/data/course_client.dart';
 import 'package:tattoo/data/i_school_plus_client.dart';
 import 'package:tattoo/data/portal_client.dart';
+import 'package:tattoo/welcome_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(),
+      home: const WelcomeScreen(),
     );
   }
 }
