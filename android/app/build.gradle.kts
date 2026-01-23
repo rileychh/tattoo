@@ -32,7 +32,7 @@ android {
     buildTypes {
         release {
             // Built unsigned - fastlane match_keystore signs the final APK
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = null
         }
     }
 }
