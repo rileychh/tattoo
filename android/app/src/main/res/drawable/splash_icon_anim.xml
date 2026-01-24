@@ -8,10 +8,16 @@
             android:height="288dp"
             android:viewportWidth="288"
             android:viewportHeight="288">
+            <!-- Testing 196px circle -->
+            <!-- <path
+            android:name="circle"
+            android:pathData="M144,51c51.3,0,93,41.7,93,93s-41.7,93-93,93s-93-41.7-93-93S92.7,51,144,51 M144,48c-53,0-96,43-96,96 s43,96,96,96s96-43,96-96S197,48,144,48L144,48z"
+            android:fillColor="#ff0000"
+            android:strokeWidth="3"/> -->
             <path
                 android:name="path_1"
-                android:pathData="M 208.2 74.9 C 208.2 87.8 197.7 98.3 184.8 98.3 L 81.7 98.3 C 81.2 98.3 80.7 98.1 80.4 97.7 C 80.1 97.3 79.8 96.9 79.8 96.4 C 79.8 83.5 90.3 73 103.2 73 L 206.4 73 C 206.9 73 207.4 73.2 207.7 73.6 C 208 73.9 208.2 74.4 208.2 74.9 Z M 157.6 140.4 L 157.6 213.7 C 157.6 214.4 157 214.9 156.4 214.9 L 146.9 214.9 C 139 214.9 132.6 208.5 132.6 200.6 L 132.6 165.5 L 157.6 140.4 Z M 157.5 98.3 L 157.5 109.8 L 132.4 134.9 L 132.4 98.3 L 157.5 98.3 Z"
-                android:fillColor="#cccccc"
+                android:pathData="M 156.2 140.8 v 65.9 c 0 0.6 -0.5 1.1 -1.1 1.1 h -8.5 c -7.1 0 -12.9 -5.8 -12.9 -12.9 v -31.6 L 156.2 140.8 Z M 201.7 81.9 c 0 11.6 -9.4 21 -21 21 H 88 c -0.4 0 -0.9 -0.2 -1.2 -0.5 c -0.3 -0.4 -0.5 -0.7 -0.5 -1.2 c 0 -11.6 9.4 -21 21 -21 h 92.8 c 0.4 0 0.9 0.2 1.2 0.5 C 201.6 81 201.7 81.4 201.7 81.9 Z M 156.1 102.9 v 10.3 l -22.6 22.6 v -32.9 H 156.1 Z"
+                android:fillColor="@color/splash_icon_background"
                 android:strokeWidth="1"/>
             <group
                 android:name="group"
@@ -19,15 +25,15 @@
                 android:pivotY="85.65">
                 <path
                     android:name="top"
-                    android:pathData="M 208.2 74.9 C 208.2 87.8 197.7 98.3 184.8 98.3 L 81.7 98.3 C 81.2 98.3 80.7 98.1 80.4 97.7 C 80.1 97.3 79.8 96.9 79.8 96.4 C 79.8 83.5 90.3 73 103.2 73 L 206.4 73 C 206.9 73 207.4 73.2 207.7 73.6 C 208 73.9 208.2 74.4 208.2 74.9 Z"
-                    android:fillColor="#3a3b3b"
+                    android:pathData="M 201.7 81.9 c 0 11.6 -9.4 21 -21 21 H 88 c -0.4 0 -0.9 -0.2 -1.2 -0.5 c -0.3 -0.4 -0.5 -0.7 -0.5 -1.2 c 0 -11.6 9.4 -21 21 -21 h 92.8 c 0.4 0 0.9 0.2 1.2 0.5 C 201.6 81 201.7 81.4 201.7 81.9 Z"
+                    android:fillColor="@color/splash_icon_foreground"
                     android:strokeWidth="0"/>
             </group>
             <group android:name="group_1">
                 <path
                     android:name="botton"
-                    android:pathData="M 157.6 140.4 L 157.6 213.7 C 157.6 214.4 157 214.9 156.4 214.9 L 146.9 214.9 C 139 214.9 132.6 208.5 132.6 200.6 L 132.6 165.5 L 157.6 140.4 Z M 157.5 98.3 L 157.5 109.8 L 132.4 134.9 L 132.4 98.3 L 157.5 98.3 Z"
-                    android:fillColor="#3a3b3b"
+                    android:pathData="M 156.2 140.8 v 65.9 c 0 0.6 -0.5 1.1 -1.1 1.1 h -8.5 c -7.1 0 -12.9 -5.8 -12.9 -12.9 v -31.6 L 156.2 140.8 Z M 156.1 102.9 v 10.3 l -22.6 22.6 v -32.9 H 156.1 Z"
+                    android:fillColor="@color/splash_icon_foreground"
                     android:strokeWidth="0"/>
             </group>
         </vector>
