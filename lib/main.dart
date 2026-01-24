@@ -123,44 +123,44 @@ class _MyHomePageState extends State<MyHomePage> {
             spacing: 24.0,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-                AutofillGroup(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    spacing: 16.0,
-                    children: [
-                      TextField(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Username',
-                        ),
-                        controller: _usernameController,
-                        autofillHints: const [AutofillHints.username],
+              AutofillGroup(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 16.0,
+                  children: [
+                    TextField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Username',
                       ),
-                      TextField(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Password',
-                        ),
-                        controller: _passwordController,
-                        autofillHints: const [AutofillHints.password],
-                        obscureText: true,
+                      controller: _usernameController,
+                      autofillHints: const [AutofillHints.username],
+                    ),
+                    TextField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Password',
                       ),
-                    ],
-                  ),
-               ),
-                DropdownMenu<PortalServiceCode>(
-                  initialSelection: PortalServiceCode.courseService,
-                  onSelected: (value) {
-                    if (value == null) return;
-                    setState(() {
-                      _selectedService = value;
-                    });
-                  },
-                  dropdownMenuEntries: [
-                    for (final service in PortalServiceCode.values)
-                      DropdownMenuEntry(value: service, label: service.name),
+                      controller: _passwordController,
+                      autofillHints: const [AutofillHints.password],
+                      obscureText: true,
+                    ),
                   ],
                 ),
+              ),
+              DropdownMenu<PortalServiceCode>(
+                initialSelection: PortalServiceCode.courseService,
+                onSelected: (value) {
+                  if (value == null) return;
+                  setState(() {
+                    _selectedService = value;
+                  });
+                },
+                dropdownMenuEntries: [
+                  for (final service in PortalServiceCode.values)
+                    DropdownMenuEntry(value: service, label: service.name),
+                ],
+              ),
             ],
           ),
         ),
