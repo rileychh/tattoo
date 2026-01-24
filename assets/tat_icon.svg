@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 27.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   version="1.1"
+   id="TAT"
+   x="0px"
+   y="0px"
+   viewBox="0 0 108 108"
+   xml:space="preserve"
+   sodipodi:docname="icon.svg"
+   width="108"
+   height="108"
+   inkscape:export-filename="material-design.png"
+   inkscape:export-xdpi="256"
+   inkscape:export-ydpi="256"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs1" /><sodipodi:namedview
+   id="namedview1"
+   pagecolor="#ffffff"
+   bordercolor="#ffffff"
+   borderopacity="1"
+   inkscape:showpageshadow="0"
+   inkscape:pageopacity="0"
+   inkscape:pagecheckerboard="1"
+   inkscape:deskcolor="#d1d1d1"
+   inkscape:zoom="4.725"
+   inkscape:cx="51.216931"
+   inkscape:cy="100.63492"
+   inkscape:window-width="2560"
+   inkscape:window-height="1371"
+   inkscape:window-x="0"
+   inkscape:window-y="0"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="TAT" />
+<style
+   type="text/css"
+   id="style1">
+	.st0{fill:#3A3B3B;}
+</style>
+<path
+   id="下半部"
+   class="st0"
+   d="m 60.310755,52.337239 v 34.0853 C 60.310755,86.742209 60.052965,87 59.733294,87 h -4.41856 c -3.676118,0 -6.656198,-2.980078 -6.656198,-6.6562 V 63.984302 Z"
+   style="fill:#3b3b3b;fill-opacity:1;stroke-width:0.0515586" />
+<path
+   id="上半部"
+   class="st0"
+   d="m 83.862668,21.881651 c 0,6.001406 -4.867123,10.868524 -10.868533,10.868524 h -12.68338 v 5.336306 L 48.658537,49.738695 V 32.750175 H 25.01898 c -0.242322,0 -0.464026,-0.09796 -0.623854,-0.257794 C 24.235293,32.332553 24.137332,32.110852 24.137332,31.868524 24.137332,25.867121 29.004453,21 35.005856,21 h 47.980311 c 0.242328,0 0.464032,0.09796 0.623861,0.257794 0.154678,0.159828 0.252641,0.381532 0.25264,0.623857 z"
+   style="fill:#3b3b3b;fill-opacity:1;stroke-width:0.0515586" />
+</svg>
