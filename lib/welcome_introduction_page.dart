@@ -128,24 +128,6 @@ class _WelcomeIntroductionPageState extends State<WelcomeIntroductionPage>
             ),
 
             const SizedBox(height: 8.0),
-            // // Get Started Button
-            // Padding(
-            //   padding: const EdgeInsets.only(bottom: 32.0),
-            //   child: SizedBox(
-            //     width: 200,
-            //     height: 64,
-            //     child: FilledButton(
-            //       onPressed: () {
-            //         Navigator.of(context).pushReplacement(
-            //           MaterialPageRoute(
-            //             builder: (_) => const WelcomeLoginPage(),
-            //           ),
-            //         );
-            //       },
-            //       child: const Text('開始使用'),
-            //     ),
-            //   ),
-            // ),
           ],
         ),
       ),
