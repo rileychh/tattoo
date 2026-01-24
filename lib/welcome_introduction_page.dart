@@ -86,7 +86,7 @@ class _WelcomeIntroductionPageState extends State<WelcomeIntroductionPage>
               spacing: 4.0,
               children: [
                 SvgPicture.asset(
-                  'assets/NPC_horizontal.svg',
+                  'assets/npc_horizontal.svg',
                   height: 24,
                   colorFilter: ColorFilter.mode(
                     Colors.grey[600]!,
