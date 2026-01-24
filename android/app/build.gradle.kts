@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "club.ntut.tattoo"
-    compileSdk = 34
+    compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
