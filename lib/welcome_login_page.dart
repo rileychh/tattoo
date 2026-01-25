@@ -19,6 +19,9 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode _usernameFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
+  String? _errorMessage;
+  bool _usernameHasError = false;
+  bool _passwordHasError = false;
   var _selectedService = PortalServiceCode.courseService;
   final _portalClient = PortalClient();
   final _courseClient = CourseClient();
@@ -95,16 +98,52 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
     log('Completed in ${stopwatch.elapsedMilliseconds} ms');
   }
 
+  void _attemptLogin() {
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text.trim();
+    String? errorMessage;
+    bool usernameHasError = false;
+    bool passwordHasError = false;
+
+    if (username.isEmpty || password.isEmpty) {
+      errorMessage = '請填寫學號與密碼';
+      usernameHasError = username.isEmpty;
+      passwordHasError = password.isEmpty;
+    } else if (username.contains('@') || username.startsWith('t')) {
+      errorMessage = '請直接使用學號登入，不要使用電子郵件';
+      usernameHasError = true;
+    }
+
+    if (errorMessage != null) {
+      setState(() {
+        _errorMessage = errorMessage;
+        _usernameHasError = usernameHasError;
+        _passwordHasError = passwordHasError;
+      });
+      return;
+    }
+
+    setState(() {
+      _errorMessage = null;
+      _usernameHasError = false;
+      _passwordHasError = false;
+    });
+
+    FocusScope.of(context).unfocus();
+    _login();
+  }
+
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     // A helper function to style login fields
-    loginDecoration(String hintText) {
+    loginDecoration(String hintText, {bool hasError = false}) {
       final surfaceColor = Theme.of(
         context,
       ).colorScheme.surfaceContainerHighest;
+      final errorColor = Theme.of(context).colorScheme.error;
       return InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
@@ -116,12 +155,12 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(50),
-          borderSide: BorderSide(color: surfaceColor),
+          borderSide: BorderSide(color: hasError ? errorColor : surfaceColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(50),
           borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.primary,
+            color: hasError ? errorColor : Theme.of(context).colorScheme.primary,
             width: 2,
           ),
         ),
@@ -218,34 +257,72 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               spacing: 16,
                               children: [
-                                TextField(
-                                  controller: _usernameController,
-                                  focusNode: _usernameFocusNode,
-                                  maxLines: 1,
-                                  decoration: loginDecoration('學號'),
-                                  textInputAction: TextInputAction.next,
-                                  onSubmitted: (_) {
-                                    _passwordFocusNode.requestFocus();
-                                  },
+                              TextField(
+                                controller: _usernameController,
+                                focusNode: _usernameFocusNode,
+                                maxLines: 1,
+                                decoration: loginDecoration(
+                                  '學號',
+                                  hasError: _usernameHasError,
                                 ),
-                                TextField(
-                                  controller: _passwordController,
-                                  focusNode: _passwordFocusNode,
-                                  maxLines: 1,
-                                  decoration: loginDecoration('密碼'),
-                                  autofillHints: const [AutofillHints.password],
-                                  obscureText: true,
-                                  textInputAction: TextInputAction.done,
-                                  onSubmitted: (_) {
-                                    FocusScope.of(context).unfocus();
-                                    _login();
-                                  },
+                                textInputAction: TextInputAction.next,
+                                onSubmitted: (_) {
+                                  _passwordFocusNode.requestFocus();
+                                },
+                                onChanged: (_) {
+                                  if (_errorMessage != null ||
+                                      _usernameHasError ||
+                                      _passwordHasError) {
+                                    setState(() {
+                                      _errorMessage = null;
+                                      _usernameHasError = false;
+                                      _passwordHasError = false;
+                                    });
+                                  }
+                                },
+                              ),
+                              TextField(
+                                controller: _passwordController,
+                                focusNode: _passwordFocusNode,
+                                maxLines: 1,
+                                decoration: loginDecoration(
+                                  '密碼',
+                                  hasError: _passwordHasError,
                                 ),
-                              ],
+                                autofillHints: const [AutofillHints.password],
+                                obscureText: true,
+                                textInputAction: TextInputAction.done,
+                                onSubmitted: (_) {
+                                  FocusScope.of(context).unfocus();
+                                  _attemptLogin();
+                                },
+                                onChanged: (_) {
+                                  if (_errorMessage != null ||
+                                      _usernameHasError ||
+                                      _passwordHasError) {
+                                    setState(() {
+                                      _errorMessage = null;
+                                      _usernameHasError = false;
+                                      _passwordHasError = false;
+                                    });
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        if (_errorMessage != null)
+                          Text(
+                            _errorMessage!,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.error,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
 
-                          // login button
+                        // login button
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Theme.of(
@@ -253,7 +330,7 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
                             ).colorScheme.primary,
                             foregroundColor: Colors.white,
                           ),
-                          onPressed: _login,
+                          onPressed: _attemptLogin,
                           child: const Text('登入'),
                         ),
 
