@@ -4,8 +4,8 @@ This project uses specific VS Code configurations for consistent development exp
 
 ## Quick Start
 
-1. Install recommended extensions (VS Code will prompt you)
-2. Create a `settings.json` file with the configuration below
+1. Install recommended extensions (VS Code will prompt you, or search `@recommended` in the Extensions panel)
+2. Create a `settings.json` file in the `.vscode/` directory with the configuration below
 
 ## Required Configuration
 
@@ -23,7 +23,7 @@ This ensures everyone uses the same Flutter version via FVM:
 
 ### `launch.json`
 
-If you need to use a MITM proxy for debugging network requests, create a `launch.json` with:
+If you need to use a MITM proxy for debugging network requests, create a `launch.json` in the `.vscode/` directory with:
 
 ```json
 {
