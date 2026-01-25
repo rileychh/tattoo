@@ -155,137 +155,148 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
                         mainAxisSize: MainAxisSize.min,
                         spacing: 24,
                         children: [
-                        // welcome title
-                        RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            style: TextStyle(
-                              fontSize: 48,
-                              fontWeight: FontWeight.w800,
-                              color: Theme.of(context).textTheme.bodyLarge?.color,
-                            ),
-                            children: [
-                              const TextSpan(text: '歡迎加入'),
-                              const TextSpan(text: '\n'),
-                              TextSpan(
-                                text: '北科生活',
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
+                          // welcome title
+                          RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              style: TextStyle(
+                                fontSize: 48,
+                                fontWeight: FontWeight.w800,
+                                color: Theme.of(
+                                  context,
+                                ).textTheme.bodyLarge?.color,
                               ),
-                            ],
-                          ),
-                        ),
-
-                        // login instruction
-                        RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              fontSize: 16,
-                              height: 1.6,
-                              color: Colors.grey[600],
-                            ),
-                            children: [
-                              const TextSpan(text: '請使用'),
-                              TextSpan(
-                                text: '北科校園入口網站',
-                                style: const TextStyle(
-                                  decoration: TextDecoration.underline,
+                              children: [
+                                const TextSpan(text: '歡迎加入'),
+                                const TextSpan(text: '\n'),
+                                TextSpan(
+                                  text: '北科生活',
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  ),
                                 ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    launchUrl(
-                                      Uri.parse('https://nportal.ntut.edu.tw'),
-                                    );
+                              ],
+                            ),
+                          ),
+
+                          // login instruction
+                          RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    fontSize: 16,
+                                    height: 1.6,
+                                    color: Colors.grey[600],
+                                  ),
+                              children: [
+                                const TextSpan(text: '請使用'),
+                                TextSpan(
+                                  text: '北科校園入口網站',
+                                  style: const TextStyle(
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      launchUrl(
+                                        Uri.parse(
+                                          'https://nportal.ntut.edu.tw',
+                                        ),
+                                      );
+                                    },
+                                ),
+                                const TextSpan(text: '的帳號密碼登入。'),
+                              ],
+                            ),
+                          ),
+
+                          // login form
+                          AutofillGroup(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              spacing: 16,
+                              children: [
+                                TextField(
+                                  controller: _usernameController,
+                                  focusNode: _usernameFocusNode,
+                                  maxLines: 1,
+                                  decoration: loginDecoration('學號'),
+                                  textInputAction: TextInputAction.next,
+                                  onSubmitted: (_) {
+                                    _passwordFocusNode.requestFocus();
                                   },
-                              ),
-                              const TextSpan(text: '的帳號密碼登入。'),
-                            ],
+                                ),
+                                TextField(
+                                  controller: _passwordController,
+                                  focusNode: _passwordFocusNode,
+                                  maxLines: 1,
+                                  decoration: loginDecoration('密碼'),
+                                  autofillHints: const [AutofillHints.password],
+                                  obscureText: true,
+                                  textInputAction: TextInputAction.done,
+                                  onSubmitted: (_) {
+                                    FocusScope.of(context).unfocus();
+                                    _login();
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
 
-                        // login form
-                        AutofillGroup(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            spacing: 16,
-                            children: [
-                              TextField(
-                                controller: _usernameController,
-                                focusNode: _usernameFocusNode,
-                                maxLines: 1,
-                                decoration: loginDecoration('學號'),
-                                textInputAction: TextInputAction.next,
-                                onSubmitted: (_) {
-                                  _passwordFocusNode.requestFocus();
-                                },
-                              ),
-                              TextField(
-                                controller: _passwordController,
-                                focusNode: _passwordFocusNode,
-                                maxLines: 1,
-                                decoration: loginDecoration('密碼'),
-                                autofillHints: const [AutofillHints.password],
-                                obscureText: true,
-                                textInputAction: TextInputAction.done,
-                                onSubmitted: (_) {
-                                  FocusScope.of(context).unfocus();
-                                  _login();
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // login button
+                          // login button
                         ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            foregroundColor: Colors.white,
+                          ),
                           onPressed: _login,
                           child: const Text('登入'),
                         ),
 
-                        // terms of privacy
-                        Column(
-                          spacing: 8.0,
-                          children: [
-                            Icon(
-                              Icons.info_outline,
-                              size: screenHeight * 0.03,
-                              color: Colors.grey[600],
-                            ),
-                            RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(
-                                      height: 1.6,
-                                      color: Colors.grey[600],
-                                    ),
-                                children: [
-                                  const TextSpan(text: '登入資訊將被安全地儲存在您的裝置中'),
-                                  const TextSpan(text: '\n'),
-                                  const TextSpan(text: '登入即表示您同意我們的'),
-                                  TextSpan(
-                                    text: '隱私條款',
-                                    style: const TextStyle(
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () {
-                                        launchUrl(
-                                          Uri.parse(
-                                            'https://example.com/terms-of-service',
-                                          ),
-                                        );
-                                      },
-                                  ),
-                                ],
+                          // terms of privacy
+                          Column(
+                            spacing: 8.0,
+                            children: [
+                              Icon(
+                                Icons.info_outline,
+                                size: screenHeight * 0.03,
+                                color: Colors.grey[600],
                               ),
-                            ),
-                          ],
-                        ),
+                              RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        height: 1.6,
+                                        color: Colors.grey[600],
+                                      ),
+                                  children: [
+                                    const TextSpan(text: '登入資訊將被安全地儲存在您的裝置中'),
+                                    const TextSpan(text: '\n'),
+                                    const TextSpan(text: '登入即表示您同意我們的'),
+                                    TextSpan(
+                                      text: '隱私條款',
+                                      style: const TextStyle(
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () {
+                                          launchUrl(
+                                            Uri.parse(
+                                              'https://example.com/terms-of-service',
+                                            ),
+                                          );
+                                        },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
