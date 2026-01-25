@@ -1,10 +1,8 @@
-import 'dart:developer';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:tattoo/data/course_client.dart';
-import 'package:tattoo/data/i_school_plus_client.dart';
 import 'package:tattoo/data/portal_client.dart';
+import 'package:tattoo/models/portal.dart';
+import 'package:tattoo/testPage.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class WelcomeLoginPage extends StatefulWidget {
@@ -22,10 +20,7 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
   String? _errorMessage;
   bool _usernameHasError = false;
   bool _passwordHasError = false;
-  var _selectedService = PortalServiceCode.courseService;
   final _portalClient = PortalClient();
-  final _courseClient = CourseClient();
-  final _iSchoolPlusClient = ISchoolPlusClient();
 
   @override
   void dispose() {
@@ -36,85 +31,51 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
     super.dispose();
   }
 
-  Future<void> _login() async {
-    Stopwatch stopwatch = Stopwatch()..start();
-
-    final user = await _portalClient.login(
-      _usernameController.text,
+  Future<User> _login() async {
+    return _portalClient.login(
+      _usernameController.text.trim(),
       _passwordController.text,
     );
-    inspect(user);
-
-    await _portalClient.sso(_selectedService);
-
-    switch (_selectedService) {
-      case PortalServiceCode.courseService:
-        final semesterList = await _courseClient.getCourseSemesterList(
-          _usernameController.text,
-        );
-        inspect(semesterList);
-
-        final courseSchedule = await _courseClient.getCourseTable(
-          username: _usernameController.text,
-          semester: semesterList.first,
-        );
-        inspect(courseSchedule);
-
-        final course = await _courseClient.getCourse(
-          courseSchedule
-              .firstWhere((schedule) => schedule.course?.id != null)
-              .course!,
-        );
-        inspect(course);
-        break;
-      case PortalServiceCode.iSchoolPlusService:
-        // Open-Source System Software and Practice
-        const courseNumber = "340689";
-        final materials = await _iSchoolPlusClient.getMaterials(courseNumber);
-
-        final redirectMaterial = await _iSchoolPlusClient.getMaterial(
-          materials[0],
-        );
-        inspect(redirectMaterial);
-
-        final pdfMaterial = await _iSchoolPlusClient.getMaterial(materials[1]);
-        inspect(pdfMaterial);
-
-        // Course recording materials are unimplemented
-        try {
-          final courseRecordingMaterial = await _iSchoolPlusClient.getMaterial(
-            materials.last,
-          );
-          inspect(courseRecordingMaterial);
-        } catch (e) {
-          inspect(e.toString());
-        }
-        break;
-      default:
-        break;
-    }
-
-    stopwatch.stop();
-    log('Completed in ${stopwatch.elapsedMilliseconds} ms');
   }
 
-  void _attemptLogin() {
+  Future<void> _attemptLogin() async {
     final username = _usernameController.text.trim();
-    final password = _passwordController.text.trim();
+    final password = _passwordController.text;
     String? errorMessage;
     bool usernameHasError = false;
     bool passwordHasError = false;
+    User? user;
 
-    if (username.isEmpty || password.isEmpty) {
+    if (username.isEmpty || password.trim().isEmpty) {
       errorMessage = '請填寫學號與密碼';
       usernameHasError = username.isEmpty;
-      passwordHasError = password.isEmpty;
+      passwordHasError = password.trim().isEmpty;
     } else if (username.contains('@') || username.startsWith('t')) {
       errorMessage = '請直接使用學號登入，不要使用電子郵件';
       usernameHasError = true;
     }
 
-    if (errorMessage != null) {
+    if (errorMessage == null) {
+      setState(() {
+        _errorMessage = null;
+        _usernameHasError = false;
+        _passwordHasError = false;
+      });
+
+      FocusScope.of(context).unfocus();
+
+      try {
+        user = await _login();
+      } catch (_) {
+        errorMessage = '登入失敗，請確認帳號密碼';
+        usernameHasError = true;
+        passwordHasError = true;
+      }
+    }
+
+    if (!mounted) return;
+
+    if (errorMessage != null || user == null) {
       setState(() {
         _errorMessage = errorMessage;
         _usernameHasError = usernameHasError;
@@ -123,14 +84,15 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
       return;
     }
 
-    setState(() {
-      _errorMessage = null;
-      _usernameHasError = false;
-      _passwordHasError = false;
-    });
-
-    FocusScope.of(context).unfocus();
-    _login();
+    final User loggedInUser = user;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => TestPage(
+          username: username,
+          user: loggedInUser,
+        ),
+      ),
+    );
   }
 
   @override
@@ -160,7 +122,9 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(50),
           borderSide: BorderSide(
-            color: hasError ? errorColor : Theme.of(context).colorScheme.primary,
+            color: hasError
+                ? errorColor
+                : Theme.of(context).colorScheme.primary,
             width: 2,
           ),
         ),
@@ -257,82 +221,79 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               spacing: 16,
                               children: [
-                              TextField(
-                                controller: _usernameController,
-                                focusNode: _usernameFocusNode,
-                                maxLines: 1,
-                                decoration: loginDecoration(
-                                  '學號',
-                                  hasError: _usernameHasError,
+                                TextField(
+                                  controller: _usernameController,
+                                  focusNode: _usernameFocusNode,
+                                  maxLines: 1,
+                                  decoration: loginDecoration(
+                                    '學號',
+                                    hasError: _usernameHasError,
+                                  ),
+                                  textInputAction: TextInputAction.next,
+                                  onSubmitted: (_) {
+                                    _passwordFocusNode.requestFocus();
+                                  },
+                                  onChanged: (_) {
+                                    if (_errorMessage != null ||
+                                        _usernameHasError ||
+                                        _passwordHasError) {
+                                      setState(() {
+                                        _errorMessage = null;
+                                        _usernameHasError = false;
+                                        _passwordHasError = false;
+                                      });
+                                    }
+                                  },
                                 ),
-                                textInputAction: TextInputAction.next,
-                                onSubmitted: (_) {
-                                  _passwordFocusNode.requestFocus();
-                                },
-                                onChanged: (_) {
-                                  if (_errorMessage != null ||
-                                      _usernameHasError ||
-                                      _passwordHasError) {
-                                    setState(() {
-                                      _errorMessage = null;
-                                      _usernameHasError = false;
-                                      _passwordHasError = false;
-                                    });
-                                  }
-                                },
-                              ),
-                              TextField(
-                                controller: _passwordController,
-                                focusNode: _passwordFocusNode,
-                                maxLines: 1,
-                                decoration: loginDecoration(
-                                  '密碼',
-                                  hasError: _passwordHasError,
+                                TextField(
+                                  controller: _passwordController,
+                                  focusNode: _passwordFocusNode,
+                                  maxLines: 1,
+                                  decoration: loginDecoration(
+                                    '密碼',
+                                    hasError: _passwordHasError,
+                                  ),
+                                  autofillHints: const [AutofillHints.password],
+                                  obscureText: true,
+                                  textInputAction: TextInputAction.done,
+                                  onSubmitted: (_) => _attemptLogin(),
+                                  onChanged: (_) {
+                                    if (_errorMessage != null ||
+                                        _usernameHasError ||
+                                        _passwordHasError) {
+                                      setState(() {
+                                        _errorMessage = null;
+                                        _usernameHasError = false;
+                                        _passwordHasError = false;
+                                      });
+                                    }
+                                  },
                                 ),
-                                autofillHints: const [AutofillHints.password],
-                                obscureText: true,
-                                textInputAction: TextInputAction.done,
-                                onSubmitted: (_) {
-                                  FocusScope.of(context).unfocus();
-                                  _attemptLogin();
-                                },
-                                onChanged: (_) {
-                                  if (_errorMessage != null ||
-                                      _usernameHasError ||
-                                      _passwordHasError) {
-                                    setState(() {
-                                      _errorMessage = null;
-                                      _usernameHasError = false;
-                                      _passwordHasError = false;
-                                    });
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        if (_errorMessage != null)
-                          Text(
-                            _errorMessage!,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.error,
-                              fontWeight: FontWeight.w600,
+                              ],
                             ),
                           ),
 
-                        // login button
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.primary,
-                            foregroundColor: Colors.white,
+                          if (_errorMessage != null)
+                            Text(
+                              _errorMessage!,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.error,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+
+                          // login button
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.primary,
+                              foregroundColor: Colors.white,
+                            ),
+                            onPressed: _attemptLogin,
+                            child: const Text('登入'),
                           ),
-                          onPressed: _attemptLogin,
-                          child: const Text('登入'),
-                        ),
 
                           // terms of privacy
                           Column(
