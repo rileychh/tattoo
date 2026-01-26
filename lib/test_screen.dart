@@ -197,11 +197,12 @@ class _TestPageState extends State<TestPage> {
         message: e.toString(),
       );
     } finally {
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-        _activeService = null;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _activeService = null;
+        });
+      }
     }
   }
 

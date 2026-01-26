@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:tattoo/data/portal_client.dart';
 import 'package:tattoo/models/portal.dart';
-import 'package:tattoo/testPage.dart';
+import 'package:tattoo/test_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class WelcomeLoginPage extends StatefulWidget {
