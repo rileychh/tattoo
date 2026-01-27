@@ -193,9 +193,7 @@ class CourseService {
       final phase = int.tryParse(cells[2].text.trim());
       final credits = double.tryParse(cells[3].text.trim());
       final hours = int.tryParse(cells[4].text.trim());
-      final type = CourseType.values.firstWhereOrNull(
-        (e) => e.name == _parseCellText(cells[5]),
-      );
+      final type = _parseCourseType(cells[5]);
       final teacher = _parseCellRef(cells[6]);
       final classes = _parseCellRefs(cells[7]);
 
@@ -386,5 +384,19 @@ class CourseService {
 
     final refs = anchors.map(toReference).toList();
     return refs.isNotEmpty ? refs : null;
+  }
+
+  CourseType? _parseCourseType(Element cell) {
+    final text = _parseCellText(cell);
+    switch (text) {
+      case '必':
+        return CourseType.required;
+      case '選':
+        return CourseType.elective;
+      case '通':
+        return CourseType.general;
+      default:
+        return null;
+    }
   }
 }
