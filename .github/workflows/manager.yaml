@@ -1,0 +1,27 @@
+name: Build Number Manager
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    outputs:
+      build_number:
+        description: "The synchronized next build number"
+        value: ${{ jobs.generate-id.outputs.new_id }}
+
+jobs:
+  generate-id:
+    runs-on: ubuntu-latest
+    outputs:
+      new_id: ${{ steps.get_id.outputs.id }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Fetch and Increment ID
+        id: get_id
+        env:
+          CI_PAT: ${{ secrets.CI_PAT }}
+        run: |
+          chmod +x ./scripts/get_build_number.sh
+          RESULT=$(./scripts/get_build_number.sh)
+          echo "id=$RESULT" >> $GITHUB_OUTPUT
