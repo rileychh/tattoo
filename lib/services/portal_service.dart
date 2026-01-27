@@ -24,7 +24,10 @@ typedef UserDTO = ({
   int? passwordExpiresInDays,
 });
 
-// Identification codes for NTUT services used in SSO
+/// Identification codes for NTUT services used in SSO authentication.
+///
+/// These codes are passed to [PortalService.sso] to authenticate with
+/// different NTUT web services.
 enum PortalServiceCode {
   scoreService('aa_003_LB_oauth'),
   courseService('aa_0010-oauth'),
@@ -34,6 +37,17 @@ enum PortalServiceCode {
   const PortalServiceCode(this.code);
 }
 
+/// Service for authenticating with NTUT Portal and performing SSO.
+///
+/// This service handles:
+/// - User authentication (login/logout)
+/// - Session management
+/// - Single sign-on (SSO) to other NTUT services
+/// - User profile and avatar retrieval
+///
+/// All HTTP clients in the application share a single cookie jar, so logging in
+/// through this service provides authentication for all other services after
+/// calling [sso] for each required service.
 class PortalService {
   late final Dio _portalDio;
 
@@ -44,7 +58,14 @@ class PortalService {
       ..options.headers = {'User-Agent': 'Direk ios App'};
   }
 
-  // Sets the JSESSIONID cookie in app.ntut.edu.tw domain
+  /// Authenticates a user with NTUT Portal credentials.
+  ///
+  /// Sets the JSESSIONID cookie in the app.ntut.edu.tw domain for subsequent
+  /// authenticated requests. This session cookie is shared across all services.
+  ///
+  /// Returns user profile information including name, email, and avatar filename.
+  ///
+  /// Throws an [Exception] if login fails due to invalid credentials.
   Future<UserDTO> login(String username, String password) async {
     final response = await _portalDio.post(
       'login.do',
@@ -68,12 +89,22 @@ class PortalService {
     );
   }
 
+  /// Checks if the current session is authenticated with NTUT Portal.
+  ///
+  /// Returns `true` if a valid JSESSIONID cookie exists and the session is active,
+  /// `false` otherwise.
   Future<bool> isLoggedIn() async {
     final response = await _portalDio.get('sessionCheckApp.do');
     final body = jsonDecode(response.data);
     return body["success"] == true;
   }
 
+  /// Fetches a user's profile photo from NTUT Portal.
+  ///
+  /// The [filename] should be obtained from the `avatarFilename` field of
+  /// [UserDTO] returned by [login].
+  ///
+  /// Returns the avatar image as raw bytes.
   Future<Uint8List> getAvatar(String filename) async {
     final response = await _portalDio.get(
       'photoView.do',
@@ -83,7 +114,20 @@ class PortalService {
     return response.data;
   }
 
-  // Perform SSO and set cookies for the target service
+  /// Performs single sign-on (SSO) to authenticate with a target NTUT service.
+  ///
+  /// This method must be called after [login] to obtain session cookies for
+  /// other NTUT services (Course Service, Score Service, or I-School Plus).
+  ///
+  /// The SSO process:
+  /// 1. Fetches an SSO form from Portal with the service code
+  /// 2. Submits the form to the target service
+  /// 3. Sets the necessary authentication cookies for that service
+  ///
+  /// All services share the same cookie jar, so SSO only needs to be called once
+  /// per service during a session.
+  ///
+  /// Throws an [Exception] if the SSO form is not found (user may not be logged in).
   Future<void> sso(PortalServiceCode serviceCode) async {
     // Fetch a self-submitting SSO form
     final response = await _portalDio.get(

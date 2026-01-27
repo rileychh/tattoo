@@ -91,6 +91,17 @@ typedef CourseDTO = ({
   String? descriptionEn,
 });
 
+/// Service for accessing NTUT's course selection and catalog system.
+///
+/// This service provides access to:
+/// - Student course schedules and enrollment
+/// - Course catalog information
+/// - Teacher, classroom, and syllabus data
+///
+/// Authentication is required through [PortalService.sso] with
+/// [PortalServiceCode.courseService] before using this service.
+///
+/// Data is parsed from HTML pages as NTUT does not provide a REST API.
 class CourseService {
   late final Dio _courseDio;
 
@@ -99,6 +110,13 @@ class CourseService {
       ..options.baseUrl = 'https://aps.ntut.edu.tw/course/tw/';
   }
 
+  /// Fetches the list of available semesters for a student's course schedule.
+  ///
+  /// Returns a list of semester identifiers (year and semester number) for which
+  /// course schedules are available for the given [username] (student ID).
+  ///
+  /// This method should be called before [getCourseTable] to determine which
+  /// semesters have course data available.
   Future<List<SemesterDTO>> getCourseSemesterList(
     String username,
   ) async {
@@ -124,6 +142,18 @@ class CourseService {
     }).toList();
   }
 
+  /// Fetches the course schedule table for a specific student and semester.
+  ///
+  /// Returns a list of course offerings enrolled by the student, including:
+  /// - Course details (name, credits, hours)
+  /// - Schedule information (days, periods, classroom)
+  /// - Teacher and class information
+  /// - Enrollment status and remarks
+  ///
+  /// The [username] should be a student ID, and [semester] should be obtained
+  /// from [getCourseSemesterList].
+  ///
+  /// Throws an [Exception] if no courses are found for the given semester.
   Future<List<ScheduleDTO>> getCourseTable({
     required String username,
     required SemesterDTO semester,
@@ -209,6 +239,15 @@ class CourseService {
     }).toList();
   }
 
+  /// Fetches detailed information about a specific course from the catalog.
+  ///
+  /// Returns course details including bilingual names, descriptions, credits,
+  /// and hours per week.
+  ///
+  /// The [courseId] should be a course code obtained from the `course.id` field
+  /// of a [ScheduleDTO].
+  ///
+  /// Throws an [Exception] if the course details table is not found.
   Future<CourseDTO> getCourse(String courseId) async {
     final response = await _courseDio.get(
       'Curr.jsp',
@@ -246,6 +285,12 @@ class CourseService {
     );
   }
 
+  /// Fetches detailed information about a specific teacher.
+  ///
+  /// Returns teacher profile information for the given [teacherId] in a specific
+  /// [semester].
+  ///
+  /// This method is not yet implemented.
   Future getTeacher({
     required String teacherId,
     required SemesterDTO semester,
@@ -263,6 +308,12 @@ class CourseService {
     throw UnimplementedError();
   }
 
+  /// Fetches detailed information about a specific classroom.
+  ///
+  /// Returns classroom information including location and schedule for the given
+  /// [classroomId] in a specific [semester].
+  ///
+  /// This method is not yet implemented.
   Future getClassroom({
     required String classroomId,
     required SemesterDTO semester,
@@ -280,6 +331,16 @@ class CourseService {
     throw UnimplementedError();
   }
 
+  /// Fetches the detailed syllabus for a course offering.
+  ///
+  /// Returns syllabus information including course objectives, textbooks,
+  /// grading policy, and weekly schedule.
+  ///
+  /// The [courseNumber] should be a course offering number (e.g., "313146"),
+  /// and [id] should be the syllabus ID from the `syllabusId` field of a
+  /// [ScheduleDTO].
+  ///
+  /// This method is not yet implemented.
   Future getSyllabus({
     required String courseNumber,
     required String id,

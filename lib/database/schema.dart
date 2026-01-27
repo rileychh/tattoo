@@ -298,7 +298,11 @@ class Materials extends Table with AutoIncrementId {
   /// Title/name of the material or resource.
   late final title = text().nullable()();
 
-  /// URL/link to the material (may be a download link or external resource).
+  /// SCORM resource identifier for the material.
+  ///
+  /// This is an encoded identifier from the SCORM manifest, typically starting
+  /// with "@" followed by a hash (e.g., "@JMsMWnkmxfPFKNAvTmCuuQOeeDyjdh0hXA_...").
+  /// This value is used internally by I-School Plus to locate the resource.
   late final href = text().nullable()();
 
   @override
