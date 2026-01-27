@@ -5,19 +5,33 @@ import 'package:dio_redirect_interceptor/dio_redirect_interceptor.dart';
 import 'package:html/parser.dart';
 import 'package:tattoo/utils/http.dart';
 
+/// Student enrolled in an i-School Plus course.
 typedef StudentDTO = ({
+  /// Student's NTUT ID (e.g., "111360109").
   String? id,
+
+  /// Student's full name.
   String? name,
 });
 
+/// Reference to a course material file in i-School Plus.
 typedef MaterialRefDTO = ({
+  /// Course selection number this material belongs to.
   String courseNumber,
+
+  /// Title/filename of the material.
   String? title,
+
+  /// Relative path/href to the material resource.
   String? href,
 });
 
+/// Downloadable course material with its access information.
 typedef MaterialDTO = ({
+  /// Direct download URL for the material file.
   Uri downloadUrl,
+
+  /// Referer URL required for some downloads (e.g., PDF viewer pages).
   String? referer,
 });
 

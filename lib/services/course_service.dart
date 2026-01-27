@@ -5,33 +5,89 @@ import 'package:tattoo/models/course.dart';
 import 'package:tattoo/utils/http.dart';
 import 'package:collection/collection.dart';
 
-typedef ReferenceDTO = ({String? id, String? name});
+/// Reference to an entity (course, teacher, classroom, etc.) with an ID and name.
+typedef ReferenceDTO = ({
+  /// Entity's unique identifier code.
+  String? id,
 
-typedef SemesterDTO = ({int? year, int? semester});
+  /// Entity's display name.
+  String? name,
+});
 
+/// Academic semester identifier.
+typedef SemesterDTO = ({
+  /// Academic year in ROC calendar (e.g., 114 for 2025).
+  int? year,
+
+  /// Semester number (1 for fall, 2 for spring).
+  int? semester,
+});
+
+/// Course schedule entry from the course selection system.
 typedef ScheduleDTO = ({
+  /// Course offering number (e.g., "313146", "352902").
   String? number,
+
+  /// Reference to the course.
   ReferenceDTO? course,
+
+  /// Number of credits for this course.
   double? credits,
+
+  /// Number of hours per week.
   int? hours,
+
+  /// Type of course for graduation requirements.
   CourseType? type,
+
+  /// Reference to the instructor.
   ReferenceDTO? teacher,
+
+  /// List of class/program references this course belongs to.
   List<ReferenceDTO>? classes,
+
+  /// Weekly schedule as list of (day, period) tuples.
   List<(DayOfWeek, Period)>? schedule,
+
+  /// Reference to the classroom location.
   ReferenceDTO? classroom,
+
+  /// Enrollment status for special cases (e.g., "撤選" for withdrawal).
+  ///
+  /// Normally null for regular enrolled courses.
   String? status,
+
+  /// Language of instruction.
   String? language,
+
+  /// Syllabus identifier for fetching course syllabus.
   String? syllabusId,
+
+  /// Additional remarks or notes about the course.
   String? remarks,
 });
 
+/// Course information from the course catalog.
 typedef CourseDTO = ({
+  /// Course's unique identifier code.
   String? id,
+
+  /// Course name in Traditional Chinese.
   String? nameZh,
+
+  /// Course name in English.
   String? nameEn,
+
+  /// Number of credits.
   double? credits,
+
+  /// Number of hours per week.
   int? hours,
+
+  /// Course description in Traditional Chinese.
   String? descriptionZh,
+
+  /// Course description in English.
   String? descriptionEn,
 });
 
@@ -167,7 +223,7 @@ class CourseService {
 
     final tableRows = table.querySelectorAll('tr');
 
-    // Second row containes id, name, credits, hours
+    // Second row contains id, name, credits, hours
     final secondRowCells = tableRows[1].children;
     final id = _parseCellText(secondRowCells[0]);
     final nameZh = _parseCellText(secondRowCells[1]);

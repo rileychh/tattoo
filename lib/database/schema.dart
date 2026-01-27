@@ -176,7 +176,7 @@ class CourseOfferings extends Table with AutoIncrementId, Fetchable {
   /// Reference to the semester when this course is offered.
   late final semester = integer().references(Semesters, #id)();
 
-  /// Unique course offering number/section identifier (e.g., "CS101-01").
+  /// Unique course offering number (e.g., "313146", "352902").
   late final number = text().unique()();
 
   /// Course sequence phase/stage number (階段, e.g., "1", "2").
@@ -188,7 +188,9 @@ class CourseOfferings extends Table with AutoIncrementId, Fetchable {
   /// Type of course (required/elective/general).
   late final courseType = textEnum<CourseType>()();
 
-  /// Enrollment status (e.g., "撤選").
+  /// Enrollment status for special cases (e.g., "撤選" for withdrawal).
+  ///
+  /// Normally null for regular enrolled courses.
   late final status = text().nullable()();
 
   /// Language of instruction (e.g., "英語").
