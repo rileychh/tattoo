@@ -9,7 +9,7 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Get Flutter version from .fvmrc and download Flutter SDK
-COPY .fvmrc .
+COPY ../.fvmrc .
 RUN FLUTTER_VERSION=$(jq -r .flutter .fvmrc) && \
     mkdir -p /flutter && \
     curl -fsSL "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz" | \
@@ -21,11 +21,11 @@ RUN git config --global --add safe.directory /flutter
 ENV PATH="/flutter/bin:${PATH}"
 
 # Resolve app dependencies
-COPY pubspec.* ./
+COPY ../pubspec.* ./
 RUN flutter pub get
 
 # Copy app source code
-COPY . .
+COPY ../ ./
 
 # Generate documentation
 RUN dart doc
