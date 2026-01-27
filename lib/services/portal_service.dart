@@ -72,11 +72,11 @@ class PortalService {
       queryParameters: {'muid': username, 'mpassword': password},
     );
 
-    if (!await isLoggedIn()) {
+    final body = jsonDecode(response.data);
+    if (!body['success']) {
       throw Exception('Login failed. Please check your credentials.');
     }
 
-    final body = jsonDecode(response.data);
     final String? passwordExpiredRemind = body['passwordExpiredRemind'];
 
     return (
