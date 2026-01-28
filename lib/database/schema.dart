@@ -148,6 +148,7 @@ class Classrooms extends Table with AutoIncrementId, Fetchable {
 /// User account information from the NTUT portal.
 ///
 /// Represents the authenticated user's account details and profile.
+@TableIndex(name: 'user_student', columns: {#student})
 class Users extends Table with AutoIncrementId {
   /// Reference to the student record associated with this user account.
   late final student = integer().references(Students, #id)();
@@ -168,7 +169,8 @@ class Users extends Table with AutoIncrementId {
 ///
 /// Represents a course section (班級) in a specific semester with its
 /// schedule, teachers, and enrollment information.
-@TableIndex(name: 'semester_course_offerings', columns: {#semester})
+@TableIndex(name: 'course_offering_course', columns: {#course})
+@TableIndex(name: 'course_offering_semester', columns: {#semester})
 class CourseOfferings extends Table with AutoIncrementId, Fetchable {
   /// Reference to the course definition.
   late final course = integer().references(Courses, #id)();
@@ -270,6 +272,7 @@ class CourseOfferingStudents extends Table {
 ///
 /// Each record represents one time slot (day + period) for a course offering.
 /// A course that meets multiple times per week will have multiple schedule records.
+@TableIndex(name: 'schedule_course_offering', columns: {#courseOffering})
 class Schedules extends Table with AutoIncrementId {
   /// Reference to the course offering.
   late final courseOffering = integer().references(CourseOfferings, #id)();
@@ -291,6 +294,7 @@ class Schedules extends Table with AutoIncrementId {
 /// Represents files, recordings, and other materials posted to I-School Plus.
 ///
 /// Data source: I-School Plus materials and recordings page
+@TableIndex(name: 'material_course_offering', columns: {#courseOffering})
 class Materials extends Table with AutoIncrementId {
   /// Reference to the course offering this material belongs to.
   late final courseOffering = integer().references(CourseOfferings, #id)();

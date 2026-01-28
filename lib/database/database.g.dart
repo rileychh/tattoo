@@ -4746,9 +4746,25 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $CourseOfferingStudentsTable(this);
   late final $SchedulesTable schedules = $SchedulesTable(this);
   late final $MaterialsTable materials = $MaterialsTable(this);
-  late final Index semesterCourseOfferings = Index(
-    'semester_course_offerings',
-    'CREATE INDEX semester_course_offerings ON course_offerings (semester)',
+  late final Index userStudent = Index(
+    'user_student',
+    'CREATE INDEX user_student ON users (student)',
+  );
+  late final Index courseOfferingCourse = Index(
+    'course_offering_course',
+    'CREATE INDEX course_offering_course ON course_offerings (course)',
+  );
+  late final Index courseOfferingSemester = Index(
+    'course_offering_semester',
+    'CREATE INDEX course_offering_semester ON course_offerings (semester)',
+  );
+  late final Index scheduleCourseOffering = Index(
+    'schedule_course_offering',
+    'CREATE INDEX schedule_course_offering ON schedules (course_offering)',
+  );
+  late final Index materialCourseOffering = Index(
+    'material_course_offering',
+    'CREATE INDEX material_course_offering ON materials (course_offering)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -4769,7 +4785,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     courseOfferingStudents,
     schedules,
     materials,
-    semesterCourseOfferings,
+    userStudent,
+    courseOfferingCourse,
+    courseOfferingSemester,
+    scheduleCourseOffering,
+    materialCourseOffering,
   ];
 }
 
