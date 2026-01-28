@@ -12,10 +12,12 @@
       "rangeStrategy": "pin"
     },
     {
-      "matchPackageNames": ["flutter", "dart"],
-      "rangeStrategy": "auto",
-      "groupName": "Flutter and Dart",
-      "groupSlug": "flutter"
+      "matchPackageNames": ["dart"],
+      "enabled": false
+    },
+    {
+      "matchManagers": ["fvm"],
+      "groupName": "Flutter"
     },
     {
       "matchFileNames": ["android/**"],
