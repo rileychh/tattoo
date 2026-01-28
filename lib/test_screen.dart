@@ -1,10 +1,9 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:tattoo/data/course_client.dart';
-import 'package:tattoo/data/i_school_plus_client.dart';
-import 'package:tattoo/data/portal_client.dart';
-import 'package:tattoo/models/portal.dart';
+import 'package:tattoo/services/course_service.dart';
+import 'package:tattoo/services/i_school_plus_service.dart';
+import 'package:tattoo/services/portal_service.dart';
 
 class TestPage extends StatefulWidget {
   const TestPage({
@@ -14,16 +13,16 @@ class TestPage extends StatefulWidget {
   });
 
   final String username;
-  final User user;
+  final UserDTO user;
 
   @override
   State<TestPage> createState() => _TestPageState();
 }
 
 class _TestPageState extends State<TestPage> {
-  final _portalClient = PortalClient();
-  final _courseClient = CourseClient();
-  final _iSchoolPlusClient = ISchoolPlusClient();
+  final _portalClient = PortalService();
+  final _courseClient = CourseService();
+  final _iSchoolPlusClient = ISchoolPlusService();
 
   bool _isLoading = false;
   PortalServiceCode? _activeService;
@@ -129,16 +128,16 @@ class _TestPageState extends State<TestPage> {
                 .where((course) => course?.id != null)
                 .firstOrNull;
             if (courseRef != null) {
-              final course = await _courseClient.getCourse(courseRef);
+              final course = await _courseClient.getCourse(courseRef.id!);
               final courseName =
-                  course.name?.zh ?? course.name?.en ?? course.id ?? '未知';
+                  course.nameZh ?? course.nameEn ?? course.id ?? '未知';
               buffer.writeln('\n課程詳情:');
               buffer.writeln('- 名稱: $courseName');
               buffer.writeln('- 代碼: ${course.id ?? '未知'}');
               buffer.writeln('- 學分: ${course.credits ?? '未知'}');
               buffer.writeln('- 時數: ${course.hours ?? '未知'}');
               final description =
-                  course.description?.zh ?? course.description?.en ?? '（無）';
+                  course.descriptionZh ?? course.descriptionEn ?? '（無）';
               buffer.writeln('- 說明: $description');
             }
           }

@@ -1,9 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:tattoo/data/portal_client.dart';
-import 'package:tattoo/models/portal.dart';
 import 'package:tattoo/test_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:tattoo/services/portal_service.dart';
 
 class WelcomeLoginPage extends StatefulWidget {
   const WelcomeLoginPage({super.key, this.onRequestPreviousPage});
@@ -24,7 +23,7 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
   String? _errorMessage;
   bool _usernameHasError = false;
   bool _passwordHasError = false;
-  final _portalClient = PortalClient();
+  final _portalClient = PortalService();
 
   bool get _isAtTop {
     if (!_scrollController.hasClients) return true;
@@ -70,7 +69,7 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
     super.dispose();
   }
 
-  Future<User> _login() async {
+  Future<UserDTO> _login() async {
     return _portalClient.login(
       _usernameController.text.trim(),
       _passwordController.text,
@@ -83,7 +82,7 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
     String? errorMessage;
     bool usernameHasError = false;
     bool passwordHasError = false;
-    User? user;
+    UserDTO? user;
 
     if (username.isEmpty || password.trim().isEmpty) {
       errorMessage = '請填寫學號與密碼';
@@ -124,7 +123,7 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
       return;
     }
 
-    final User loggedInUser = user;
+    final UserDTO loggedInUser = user;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => TestPage(
