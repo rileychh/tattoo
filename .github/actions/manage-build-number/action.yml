@@ -5,6 +5,9 @@ inputs:
   github_token:
     description: GitHub token with permissions to write repository variables
     required: true
+  current_build_number:
+    description: Current build number from repository variables
+    required: true
 
 outputs:
   build_number:
@@ -19,9 +22,8 @@ runs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-        BUILD_NUMBER: ${{ vars.build_number }}
+        BUILD_NUMBER: ${{ inputs.current_build_number }}
       run: |
-        echo "Current build number: $BUILD_NUMBER"
         NEW_NUMBER=$((BUILD_NUMBER + 1))
 
         curl -fsSL \
@@ -32,5 +34,5 @@ runs:
           "https://api.github.com/repos/${{ github.repository }}/actions/variables/build_number" \
           -d "{\"name\":\"build_number\",\"value\":\"$NEW_NUMBER\"}"
 
-        echo "Incremented build number to: $NEW_NUMBER"
+        echo "build_number: $BUILD_NUMBER → $NEW_NUMBER"
         echo "build_number=$NEW_NUMBER" >> $GITHUB_OUTPUT

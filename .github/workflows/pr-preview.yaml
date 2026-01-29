@@ -21,6 +21,7 @@ jobs:
         uses: ./.github/actions/manage-build-number
         with:
           github_token: ${{ secrets.BUILD_NUMBER_PAT }}
+          current_build_number: ${{ vars.build_number }}
 
       - name: Build and Upload to TestFlight
         env:
