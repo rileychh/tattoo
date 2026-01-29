@@ -27,15 +27,48 @@ platform :ios do
       build: "ipa",
     )
   end
+
+  desc "Build and upload PR preview to TestFlight Internal Testing"
+  lane :upload_pr_preview do |options|
+    build_number = options[:build_number] || "1"
+    pr_number = options[:pr_number] || "unknown"
+    pr_title = options[:pr_title] || ""
+
+    setup_ci if is_ci
+
+    sync_code_signing(
+      type: "appstore",
+      readonly: is_ci
+    )
+
+    increment_build_number(
+      build_number: build_number,
+      xcodeproj: "ios/Runner.xcodeproj"
+    )
+
+    flutter_build(build: "ipa")
+
+    app_store_connect_api_key(
+      is_key_content_base64: true
+    )
+
+    upload_to_testflight(
+      ipa: "build/ios/ipa/tattoo.ipa",
+      changelog: "PR ##{pr_number}: #{pr_title}\nBuild: #{build_number}",
+      skip_waiting_for_build_processing: is_ci
+    )
+
+    puts "Uploaded build #{build_number} for PR ##{pr_number} to TestFlight"
+  end
 end
 
 platform :android do
   # Shared keystore configuration
   def keystore_config
     {
-      git_url: ENV["MATCH_KEYSTORE_GIT_URL"],
+      git_url: ENV["MATCH_GIT_URL"],
       package_name: "club.ntut.tattoo",
-      match_secret: ENV["MATCH_KEYSTORE_SECRET"]
+      match_secret: ENV["MATCH_PASSWORD"]
     }
   end
 
