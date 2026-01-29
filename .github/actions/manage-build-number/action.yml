@@ -21,10 +21,9 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         BUILD_NUMBER: ${{ vars.build_number }}
       run: |
-        BUILD_NUMBER=${BUILD_NUMBER:-0}
         NEW_NUMBER=$((BUILD_NUMBER + 1))
 
-        curl -s -L \
+        curl -fsSL \
           -X PATCH \
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer $GITHUB_TOKEN" \
