@@ -1,25 +1,28 @@
 name: Setup Project
-description: Read Flutter version, setup Flutter, and get dependencies
+description: Install development tools with mise and get dependencies
 
 outputs:
   flutter-version:
-    description: 'The Flutter version read from .fvmrc'
-    value: ${{ steps.fvm.outputs.version }}
+    description: 'The Flutter version read from mise.toml'
+    value: ${{ steps.mise-versions.outputs.flutter }}
 
 runs:
   using: composite
   steps:
-    - name: Read Flutter version from .fvmrc
-      id: fvm
+    - name: Install mise
+      uses: jdx/mise-action@6d1e696aa24c1aa1bcc1adea0212707c71ab78a8 # v3.6.1
+
+    - name: Read tool versions
+      id: mise-versions
       shell: bash
-      run: echo "version=$(jq -r .flutter .fvmrc)" >> $GITHUB_OUTPUT
+      run: echo "flutter=$(mise current flutter | awk '{print $2}')" >> $GITHUB_OUTPUT
 
-    - name: Setup Flutter
-      uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e # v2
-      with:
-        flutter-version: ${{ steps.fvm.outputs.version }}
-        cache: true
-
-    - name: Get dependencies
+    - name: Install Flutter dependencies
       shell: bash
       run: flutter pub get --enforce-lockfile
+
+    - name: Install Ruby dependencies
+      shell: bash
+      env:
+        BUNDLE_FROZEN: "true"
+      run: bundle install
