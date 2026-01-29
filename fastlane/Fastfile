@@ -46,7 +46,9 @@ platform :ios do
       xcodeproj: "ios/Runner.xcodeproj"
     )
 
-    flutter_build(build: "ipa")
+    flutter_build
+    
+    build_app
 
     app_store_connect_api_key(
       is_key_content_base64: true
