@@ -45,6 +45,7 @@ platform :ios do
       path: "ios/Runner.xcodeproj",
       code_sign_identity: "iPhone Distribution",
       profile_name: "match AppStore club.ntut.tattoo",
+      sdk: "iphoneos*",
     )
 
     increment_build_number(
