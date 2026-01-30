@@ -31,6 +31,7 @@ runs:
 
     - name: Read tool versions
       id: mise-versions
+      if: ${{ contains(inputs.tools, 'flutter') }}
       shell: bash
       run: echo "flutter=$(mise current flutter)" >> $GITHUB_OUTPUT
 
