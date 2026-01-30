@@ -13,7 +13,22 @@
     },
     {
       "matchPackageNames": ["dart"],
-      "rangeStrategy": "auto"
+      "enabled": false
+    },
+    {
+      "matchManagers": ["mise"],
+      "groupName": "Development tools",
+      "groupSlug": "sdk"
+    },
+    {
+      "matchFileNames": ["android/**"],
+      "groupName": "Android dependencies",
+      "groupSlug": "android"
+    },
+    {
+      "matchFileNames": ["ios/**"],
+      "groupName": "iOS dependencies",
+      "groupSlug": "ios"
     }
   ]
 }

@@ -1,10 +1,9 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:tattoo/data/course_client.dart';
-import 'package:tattoo/data/i_school_plus_client.dart';
-import 'package:tattoo/data/portal_client.dart';
-import 'package:tattoo/models/portal.dart';
+import 'package:tattoo/services/course_service.dart';
+import 'package:tattoo/services/i_school_plus_service.dart';
+import 'package:tattoo/services/portal_service.dart';
 
 class TestPage extends StatefulWidget {
   const TestPage({
@@ -14,16 +13,16 @@ class TestPage extends StatefulWidget {
   });
 
   final String username;
-  final User user;
+  final UserDTO user;
 
   @override
   State<TestPage> createState() => _TestPageState();
 }
 
 class _TestPageState extends State<TestPage> {
-  final _portalClient = PortalClient();
-  final _courseClient = CourseClient();
-  final _iSchoolPlusClient = ISchoolPlusClient();
+  final _portalService = PortalService();
+  final _courseService = CourseService();
+  final _iSchoolPlusService = ISchoolPlusService();
 
   bool _isLoading = false;
   PortalServiceCode? _activeService;
@@ -83,12 +82,12 @@ class _TestPageState extends State<TestPage> {
     final stopwatch = Stopwatch()..start();
 
     try {
-      await _portalClient.sso(service);
+      await _portalService.sso(service);
 
       final buffer = StringBuffer();
       switch (service) {
         case PortalServiceCode.courseService:
-          final semesterList = await _courseClient.getCourseSemesterList(
+          final semesterList = await _courseService.getCourseSemesterList(
             widget.username,
           );
 
@@ -102,7 +101,7 @@ class _TestPageState extends State<TestPage> {
           }
 
           if (semesterList.isNotEmpty) {
-            final courseSchedule = await _courseClient.getCourseTable(
+            final courseSchedule = await _courseService.getCourseTable(
               username: widget.username,
               semester: semesterList.first,
             );
@@ -129,23 +128,25 @@ class _TestPageState extends State<TestPage> {
                 .where((course) => course?.id != null)
                 .firstOrNull;
             if (courseRef != null) {
-              final course = await _courseClient.getCourse(courseRef);
+              final course = await _courseService.getCourse(courseRef.id!);
               final courseName =
-                  course.name?.zh ?? course.name?.en ?? course.id ?? '未知';
+                  course.nameZh ?? course.nameEn ?? course.id ?? '未知';
               buffer.writeln('\n課程詳情:');
               buffer.writeln('- 名稱: $courseName');
               buffer.writeln('- 代碼: ${course.id ?? '未知'}');
               buffer.writeln('- 學分: ${course.credits ?? '未知'}');
               buffer.writeln('- 時數: ${course.hours ?? '未知'}');
               final description =
-                  course.description?.zh ?? course.description?.en ?? '（無）';
+                  course.descriptionZh ?? course.descriptionEn ?? '（無）';
               buffer.writeln('- 說明: $description');
             }
           }
           break;
         case PortalServiceCode.iSchoolPlusService:
           const courseNumber = '340689';
-          final materials = await _iSchoolPlusClient.getMaterials(courseNumber);
+          final materials = await _iSchoolPlusService.getMaterials(
+            courseNumber,
+          );
           buffer.writeln('教材列表:');
           if (materials.isEmpty) {
             buffer.writeln('- （無）');
@@ -158,7 +159,7 @@ class _TestPageState extends State<TestPage> {
           }
 
           if (materials.isNotEmpty) {
-            final firstMaterial = await _iSchoolPlusClient.getMaterial(
+            final firstMaterial = await _iSchoolPlusService.getMaterial(
               materials.first,
             );
             buffer.writeln('\n第一個教材下載連結:');
@@ -167,7 +168,7 @@ class _TestPageState extends State<TestPage> {
           }
 
           if (materials.length > 1) {
-            final secondMaterial = await _iSchoolPlusClient.getMaterial(
+            final secondMaterial = await _iSchoolPlusService.getMaterial(
               materials[1],
             );
             buffer.writeln('\n第二個教材下載連結:');
