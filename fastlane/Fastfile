@@ -72,7 +72,6 @@ platform :ios do
     )
 
     upload_to_testflight(
-      changelog: "PR ##{pr_number}: #{pr_title}\nBuild: #{build_number}",
       skip_waiting_for_build_processing: is_ci,
     )
   end
