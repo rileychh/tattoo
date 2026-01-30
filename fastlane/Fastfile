@@ -55,18 +55,15 @@ platform :ios do
     )
 
     # Build and create xcarchive without code signing
-    flutter_build(
+    archive_path = flutter_build(
       build: "ipa",
       build_args: ["--no-codesign"],
     )
 
-    # Export the IPA from the xcarchive using gym with proper code signing
-    archive_path = lane_context[SharedValues::FLUTTER_OUTPUT]
-    UI.important("Using archive at: #{archive_path}")
-
     build_app(
       skip_build_archive: true,
       archive_path: archive_path,
+      export_team_id: ENV["APPLE_TEAM_ID"],
       suppress_xcode_output: true,
     )
 
