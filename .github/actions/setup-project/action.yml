@@ -24,6 +24,11 @@ runs:
         mise_tools=$(echo "$tools" | tr ' ' '\n' | grep -v '^ruby$' | xargs)
         echo "mise_tools=$mise_tools" >> $GITHUB_OUTPUT
 
+    - name: Select Xcode version
+      if: runner.os == 'macOS'
+      shell: bash
+      run: sudo xcode-select -s /Applications/Xcode_26.2.app/Contents/Developer
+
     - name: Install mise
       uses: jdx/mise-action@6d1e696aa24c1aa1bcc1adea0212707c71ab78a8 # v3.6.1
       with:
