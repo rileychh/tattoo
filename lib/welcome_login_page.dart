@@ -5,9 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:tattoo/services/portal_service.dart';
 
 class WelcomeLoginPage extends StatefulWidget {
-  const WelcomeLoginPage({super.key, this.onRequestPreviousPage});
-
-  final VoidCallback? onRequestPreviousPage;
+  const WelcomeLoginPage({super.key});
 
   @override
   State<WelcomeLoginPage> createState() => _WelcomeLoginPageState();
@@ -18,46 +16,10 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode _usernameFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
-  final ScrollController _scrollController = ScrollController();
-  bool _didRequestPreviousPage = false;
   String? _errorMessage;
   bool _usernameHasError = false;
   bool _passwordHasError = false;
   final _portalClient = PortalService();
-
-  bool get _isAtTop {
-    if (!_scrollController.hasClients) return true;
-    return _scrollController.position.pixels <=
-        _scrollController.position.minScrollExtent + 1;
-  }
-
-  // When the user drags downward at the top, ask the PageView to go back.
-  bool _handleScrollNotification(ScrollNotification notification) {
-    if (notification is ScrollStartNotification) {
-      _didRequestPreviousPage = false;
-    }
-
-    if (_isAtTop && !_didRequestPreviousPage) {
-      if (notification is OverscrollNotification &&
-          notification.overscroll < 0 &&
-          notification.dragDetails != null) {
-        _didRequestPreviousPage = true;
-        widget.onRequestPreviousPage?.call();
-      } else if (notification is ScrollUpdateNotification) {
-        final double delta = notification.scrollDelta ?? 0;
-        if (notification.dragDetails != null && delta < 0) {
-          _didRequestPreviousPage = true;
-          widget.onRequestPreviousPage?.call();
-        }
-      }
-    }
-
-    if (notification is ScrollEndNotification) {
-      _didRequestPreviousPage = false;
-    }
-
-    return false;
-  }
 
   @override
   void dispose() {
@@ -65,7 +27,6 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
     _passwordController.dispose();
     _usernameFocusNode.dispose();
     _passwordFocusNode.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
@@ -186,22 +147,18 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
               duration: const Duration(milliseconds: 180),
               curve: Curves.easeOut,
               padding: EdgeInsets.only(bottom: bottomInset),
-              child: NotificationListener<ScrollNotification>(
-                onNotification: _handleScrollNotification,
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  physics: const ClampingScrollPhysics(),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          spacing: 24,
-                          children: [
+              child: SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        spacing: 24,
+                        children: [
                             // welcome title
                             RichText(
                               textAlign: TextAlign.center,
@@ -390,8 +347,7 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
                   ),
                 ),
               ),
-            ),
-          );
+            );
         },
       ),
     );
