@@ -48,7 +48,7 @@ class _WelcomeIntroductionPageState extends State<WelcomeIntroductionPage>
                 // Logo and Title
                 SvgPicture.asset(
                   'assets/tat_icon.svg',
-                  height: 72,
+                  height: MediaQuery.of(context).size.height * 0.1,
                 ),
                 Text(
                   'Project Tattoo',
