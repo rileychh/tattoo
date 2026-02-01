@@ -68,11 +68,7 @@ jobs:
           platform: android
 
       - name: Build APK
-        run: >
-          flutter build apk
-            --no-pub
-            --split-per-abi
-            --build-number=${{ needs.prepare.outputs.build_number }}
+        run: flutter build apk --no-pub --split-per-abi --build-number=${{ needs.prepare.outputs.build_number }}
 
       - name: Upload armeabi-v7a Artifact
         id: upload-armeabi-v7a
