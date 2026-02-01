@@ -55,7 +55,7 @@ class WelcomeIntroductionLayout extends StatelessWidget {
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                   child: FilledButton(
                     onPressed: () => Navigator.of(context).pop(),
                     child: Padding(
