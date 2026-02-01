@@ -70,7 +70,7 @@ void main() {
 
         final courseTable = await courseService.getCourseTable(
           username: TestCredentials.username,
-          semester: semesters.first,
+          semester: semesters.pickRandom(),
         );
 
         expect(
@@ -86,14 +86,17 @@ void main() {
         );
         final courseTable = await courseService.getCourseTable(
           username: TestCredentials.username,
-          semester: semesters.first,
+          semester: semesters.pickRandom(),
         );
 
         // Find a real course (not special rows like 班週會及導師時間)
         // Real courses have a course number
-        final regularCourses = courseTable.where(
-          (schedule) => schedule.number != null && schedule.number!.isNotEmpty,
-        );
+        final regularCourses = courseTable
+            .where(
+              (schedule) =>
+                  schedule.number != null && schedule.number!.isNotEmpty,
+            )
+            .toList();
 
         expect(
           regularCourses,
@@ -101,7 +104,7 @@ void main() {
           reason: 'Should have at least one regular course with a number',
         );
 
-        final firstRegularCourse = regularCourses.first;
+        final firstRegularCourse = regularCourses.pickRandom();
 
         // Verify required fields are present for regular courses
         expect(firstRegularCourse.number, isNotEmpty);
@@ -134,12 +137,14 @@ void main() {
         );
         final courseTable = await courseService.getCourseTable(
           username: TestCredentials.username,
-          semester: semesters.first,
+          semester: semesters.pickRandom(),
         );
 
-        final coursesWithNames = courseTable.where(
-          (schedule) => schedule.course?.name != null,
-        );
+        final coursesWithNames = courseTable
+            .where(
+              (schedule) => schedule.course?.name != null,
+            )
+            .toList();
 
         expect(
           coursesWithNames,
@@ -162,13 +167,15 @@ void main() {
         );
         final courseTable = await courseService.getCourseTable(
           username: TestCredentials.username,
-          semester: semesters.first,
+          semester: semesters.pickRandom(),
         );
 
-        final coursesWithSchedule = courseTable.where(
-          (schedule) =>
-              schedule.schedule != null && schedule.schedule!.isNotEmpty,
-        );
+        final coursesWithSchedule = courseTable
+            .where(
+              (schedule) =>
+                  schedule.schedule != null && schedule.schedule!.isNotEmpty,
+            )
+            .toList();
 
         expect(
           coursesWithSchedule,
@@ -177,6 +184,8 @@ void main() {
         );
 
         // Verify schedule structure is valid (enums are guaranteed by type system)
+        // Just checking that we can access a random one without errors
+        coursesWithSchedule.pickRandom();
       });
 
       test('should parse course types correctly', () async {
@@ -185,12 +194,14 @@ void main() {
         );
         final courseTable = await courseService.getCourseTable(
           username: TestCredentials.username,
-          semester: semesters.first,
+          semester: semesters.pickRandom(),
         );
 
-        final coursesWithType = courseTable.where(
-          (schedule) => schedule.type != null,
-        );
+        final coursesWithType = courseTable
+            .where(
+              (schedule) => schedule.type != null,
+            )
+            .toList();
 
         expect(
           coursesWithType,
@@ -212,18 +223,22 @@ void main() {
     });
 
     group('getCourse', () {
-            test('should parse all course detail fields correctly', () async {
+      test('should parse all course detail fields correctly', () async {
         final semesters = await courseService.getCourseSemesterList(
           TestCredentials.username,
         );
         final courseTable = await courseService.getCourseTable(
           username: TestCredentials.username,
-          semester: semesters.first,
+          semester: semesters.pickRandom(),
         );
 
-        final courseWithId = courseTable.firstWhere(
-          (schedule) => schedule.course?.id != null,
-        );
+        final coursesWithId = courseTable
+            .where(
+              (schedule) => schedule.course?.id != null,
+            )
+            .toList();
+
+        final courseWithId = coursesWithId.pickRandom();
 
         final courseDetails = await courseService.getCourse(
           courseWithId.course!.id!,

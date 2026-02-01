@@ -37,20 +37,23 @@ void main() {
 
       final courseTable = await courseService.getCourseTable(
         username: TestCredentials.username,
-        semester: semesters.first,
+        semester: semesters.pickRandom(),
       );
 
       // Find a regular course (not special rows like 班週會及導師時間)
-      final regularCourses = courseTable.where(
-        (schedule) => schedule.number != null && schedule.number!.isNotEmpty,
-      );
+      final regularCourses = courseTable
+          .where(
+            (schedule) =>
+                schedule.number != null && schedule.number!.isNotEmpty,
+          )
+          .toList();
 
       if (regularCourses.isEmpty) {
         throw Exception('No regular courses available for testing');
       }
 
-      // Use the first regular course's number for testing
-      testCourseNumber = regularCourses.first.number!;
+      // Use a random regular course's number for testing
+      testCourseNumber = regularCourses.pickRandom().number!;
     });
 
     setUp(() async {
@@ -106,7 +109,7 @@ void main() {
           testCourseNumber,
         );
 
-        final firstStudent = students.first;
+        final firstStudent = students.pickRandom();
 
         // Verify required fields
         expect(firstStudent.id, isNotNull);
@@ -139,7 +142,7 @@ void main() {
         );
 
         if (materials.isNotEmpty) {
-          final firstMaterial = materials.first;
+          final firstMaterial = materials.pickRandom();
 
           expect(firstMaterial.courseNumber, equals(testCourseNumber));
 
@@ -176,7 +179,7 @@ void main() {
         // Test download if materials exist
         if (materials.isNotEmpty) {
           final materialInfo = await iSchoolPlusService.getMaterial(
-            materials.first,
+            materials.pickRandom(),
           );
 
           expect(
@@ -219,7 +222,7 @@ void main() {
         // Test download details if materials exist
         if (materials.isNotEmpty) {
           final materialInfo = await iSchoolPlusService.getMaterial(
-            materials.first,
+            materials.pickRandom(),
           );
 
           // Download URL should be valid

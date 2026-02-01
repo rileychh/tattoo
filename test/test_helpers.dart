@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_test/flutter_test.dart';
 
 /// Test credentials loaded from environment variables.
@@ -37,4 +39,18 @@ class TestCredentials {
 /// Adds a delay between tests to avoid hammering NTUT servers.
 Future<void> respectfulDelay() async {
   await Future.delayed(const Duration(seconds: 1));
+}
+
+final _random = Random();
+
+/// Extension to randomly pick an element from a list.
+///
+/// Provides variety in test data across test runs without increasing server load.
+extension RandomPick<T> on List<T> {
+  T pickRandom() {
+    if (length == 0) {
+      throw StateError('Cannot pick random element from empty list');
+    }
+    return this[_random.nextInt(length)];
+  }
 }
