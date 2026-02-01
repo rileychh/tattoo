@@ -43,7 +43,7 @@ jobs:
 
       - name: Create or update initial comment
         id: create
-        uses: peter-evans/create-or-update-comment@v5
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
@@ -95,7 +95,7 @@ jobs:
             --acl public-read
 
       - name: Update comment with Android build
-        uses: peter-evans/create-or-update-comment@v5
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5
         with:
           comment-id: ${{ needs.prepare.outputs.comment_id }}
           body: |
@@ -139,7 +139,7 @@ jobs:
             commit_message:"${{ needs.prepare.outputs.commit_message }}"
 
       - name: Update comment with iOS build
-        uses: peter-evans/create-or-update-comment@v5
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5
         with:
           comment-id: ${{ needs.prepare.outputs.comment_id }}
           body: |
