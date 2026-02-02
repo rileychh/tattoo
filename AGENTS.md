@@ -13,7 +13,7 @@ Follow @CONTRIBUTING.md for git operation guidelines.
 - HTTP utils, InvalidCookieFilter interceptor
 - Drift database schema with all tables
 - Service DTOs migrated to Dart 3 records
-- Service integration tests (`flutter test --dart-define-from-file=test/test_config.json`)
+- Service integration tests (copy `test/test_config.json.example` to `test/test_config.json`, then run `flutter test --dart-define-from-file=test/test_config.json`)
 
 **Todo - Service Layer:**
 - ISchoolPlusService: getCourseAnnouncement, getCourseAnnouncementDetail, courseSubscribe, getCourseSubscribe, getSubscribeNotice
@@ -64,7 +64,7 @@ MVVM pattern: UI (Widgets) → Repositories (business logic) → Services (HTTP)
 - PortalService - Portal auth, SSO
 - CourseService - 課程系統 (`aa_0010-oauth`)
 - ISchoolPlusService - 北科i學園PLUS (`ischool_plus_oauth`)
-- StudentQueryService - 學生查詢專區 (`sa_003_oauth`)
+- StudentQueryService (TODO) - 學生查詢專區 (`sa_003_oauth`)
 - Design principle: Match NTUT's actual system boundaries. Each service corresponds to one NTUT SSO target.
 - All share single cookie jar (NTUT session state)
 - Return DTOs as records (UserDTO, SemesterDTO, ScheduleDTO, etc.) - no database writes
