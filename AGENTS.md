@@ -4,6 +4,8 @@ Flutter app for NTUT students: course schedules, scores, enrollment, announcemen
 
 Follow @CONTRIBUTING.md for git operation guidelines.
 
+**Last updated:** 2026-02-02. If stale (>30 days), verify Status section against codebase.
+
 ## Status
 
 **Done:**
