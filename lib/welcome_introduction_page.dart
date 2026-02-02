@@ -22,7 +22,8 @@ class _WelcomeIntroductionPageState extends State<WelcomeIntroductionPage>
               padding: EdgeInsets.fromLTRB(8, 0, 8, 16), // Fixed bottom padding
               child: CustomScrollView(
                 slivers: [
-                  SliverToBoxAdapter(
+                  SliverFillRemaining(
+                    hasScrollBody: false,
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(
                         0,
@@ -35,6 +36,7 @@ class _WelcomeIntroductionPageState extends State<WelcomeIntroductionPage>
                         spacing: 24,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          Spacer(flex: 1),
                           // Logo and Title
                           Column(
                             children: [
@@ -54,6 +56,7 @@ class _WelcomeIntroductionPageState extends State<WelcomeIntroductionPage>
                             ],
                           ),
 
+                          Spacer(flex: 1),
                           // Features List
                           Column(
                             spacing: 8,
@@ -75,6 +78,8 @@ class _WelcomeIntroductionPageState extends State<WelcomeIntroductionPage>
                               ),
                             ],
                           ),
+
+                          Spacer(flex: 2),
 
                           // Logo and Disclaimer
                           Column(

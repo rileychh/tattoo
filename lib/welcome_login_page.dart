@@ -288,15 +288,21 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
                               ),
 
                             // login button
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.primary,
-                                foregroundColor: Colors.white,
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.primary,
+                                  foregroundColor: Colors.white,
+                                ),
+                                onPressed: _attemptLogin,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(6.0),
+                                  child: const Text('登入'),
+                                ),
                               ),
-                              onPressed: _attemptLogin,
-                              child: const Text('登入'),
                             ),
 
                             // terms of privacy
@@ -325,8 +331,7 @@ class _WelcomeLoginPageState extends State<WelcomeLoginPage> {
                                       TextSpan(
                                         text: '隱私條款',
                                         style: const TextStyle(
-                                          decoration:
-                                              TextDecoration.underline,
+                                          decoration: TextDecoration.underline,
                                         ),
                                         recognizer: TapGestureRecognizer()
                                           ..onTap = () {
