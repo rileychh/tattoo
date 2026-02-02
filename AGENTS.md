@@ -32,7 +32,6 @@ Follow @CONTRIBUTING.md for git operation guidelines.
   - getEnglishProficiency (查詢英語畢業門檻登錄資料)
   - getClassAndMentor (註冊編班與導師查詢)
   - getGraduationQualifications (查詢畢業資格審查)
-- StudentRepository
 - PortalService: getCalendar, changePassword
 
 **Todo - Repository Layer:**
