@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tattoo/models/course.dart';
 import 'package:tattoo/services/course_service.dart';
 import 'package:tattoo/services/portal_service.dart';
 
@@ -280,6 +281,161 @@ void main() {
         }
         if (courseDetails.nameEn != null) {
           expect(courseDetails.nameEn, isNotEmpty);
+        }
+      });
+    });
+
+    group('getSyllabus', () {
+      test('should parse syllabus fields correctly', () async {
+        final semesters = await courseService.getCourseSemesterList(
+          TestCredentials.username,
+        );
+        final courseTable = await courseService.getCourseTable(
+          username: TestCredentials.username,
+          semester: semesters.pickRandom(),
+        );
+
+        // Find a course with a syllabus ID
+        final coursesWithSyllabus = courseTable
+            .where(
+              (schedule) =>
+                  schedule.number != null &&
+                  schedule.number!.isNotEmpty &&
+                  schedule.syllabusId != null,
+            )
+            .toList();
+
+        expect(
+          coursesWithSyllabus,
+          isNotEmpty,
+          reason: 'Should have at least one course with a syllabus',
+        );
+
+        final course = coursesWithSyllabus.pickRandom();
+        final syllabus = await courseService.getSyllabus(
+          courseNumber: course.number!,
+          syllabusId: course.syllabusId!,
+        );
+
+        // Verify course type is a valid enum value
+        expect(
+          syllabus.type,
+          isNotNull,
+          reason: 'Syllabus should have a course type',
+        );
+        expect(
+          syllabus.type,
+          isIn(CourseType.values),
+          reason: 'Course type should be a valid CourseType enum',
+        );
+
+        // Verify enrollment numbers are reasonable
+        if (syllabus.enrolled != null) {
+          expect(
+            syllabus.enrolled,
+            greaterThanOrEqualTo(0),
+            reason: 'Enrolled count should be non-negative',
+          );
+        }
+        if (syllabus.withdrawn != null) {
+          expect(
+            syllabus.withdrawn,
+            greaterThanOrEqualTo(0),
+            reason: 'Withdrawn count should be non-negative',
+          );
+        }
+
+        // Verify lastUpdated is a valid date
+        expect(
+          syllabus.lastUpdated,
+          isNotNull,
+          reason: 'Syllabus should have a last updated date',
+        );
+      });
+
+      test('should parse syllabus content fields', () async {
+        final semesters = await courseService.getCourseSemesterList(
+          TestCredentials.username,
+        );
+        final courseTable = await courseService.getCourseTable(
+          username: TestCredentials.username,
+          semester: semesters.pickRandom(),
+        );
+
+        final coursesWithSyllabus = courseTable
+            .where(
+              (schedule) =>
+                  schedule.number != null &&
+                  schedule.number!.isNotEmpty &&
+                  schedule.syllabusId != null,
+            )
+            .toList();
+
+        final course = coursesWithSyllabus.pickRandom();
+        final syllabus = await courseService.getSyllabus(
+          courseNumber: course.number!,
+          syllabusId: course.syllabusId!,
+        );
+
+        // At least some content fields should be populated
+        final hasContent =
+            syllabus.objective != null ||
+            syllabus.weeklyPlan != null ||
+            syllabus.evaluation != null ||
+            syllabus.materials != null;
+
+        expect(
+          hasContent,
+          isTrue,
+          reason: 'Syllabus should have at least one content field populated',
+        );
+
+        // Verify non-empty strings when present
+        if (syllabus.objective != null) {
+          expect(syllabus.objective, isNotEmpty);
+        }
+        if (syllabus.weeklyPlan != null) {
+          expect(syllabus.weeklyPlan, isNotEmpty);
+        }
+        if (syllabus.evaluation != null) {
+          expect(syllabus.evaluation, isNotEmpty);
+        }
+        if (syllabus.materials != null) {
+          expect(syllabus.materials, isNotEmpty);
+        }
+      });
+
+      test('should parse email when available', () async {
+        final semesters = await courseService.getCourseSemesterList(
+          TestCredentials.username,
+        );
+        final courseTable = await courseService.getCourseTable(
+          username: TestCredentials.username,
+          semester: semesters.pickRandom(),
+        );
+
+        final coursesWithSyllabus = courseTable
+            .where(
+              (schedule) =>
+                  schedule.number != null &&
+                  schedule.number!.isNotEmpty &&
+                  schedule.syllabusId != null,
+            )
+            .toList();
+
+        final course = coursesWithSyllabus.pickRandom();
+        final syllabus = await courseService.getSyllabus(
+          courseNumber: course.number!,
+          syllabusId: course.syllabusId!,
+        );
+
+        // Email should contain @ if present
+        if (syllabus.email != null) {
+          expect(
+            syllabus.email,
+            contains('@'),
+            reason: 'Email should be a valid email format',
+          );
         }
       });
     });

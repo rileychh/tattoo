@@ -36,14 +36,31 @@ enum Period {
   const Period(this.code);
 }
 
-/// Type of course for graduation requirements.
+/// Course type for graduation credit requirements (課程標準).
+///
+/// Symbols indicate both the credit category and whether it's required/elective:
+/// - Shape: ○● (Dept), △▲ (University), ☆★ (Elective)
+/// - Fill: Empty (Common), Filled (Major)
 enum CourseType {
-  /// Required course for the major/program.
-  required,
+  /// ○ Dept. Common Required Credits (系共同必修).
+  deptCommonRequired('○'),
 
-  /// Elective course within the major/program.
-  elective,
+  /// △ University Common Required Credits (校共同必修).
+  universityCommonRequired('△'),
 
-  /// General education course.
-  general,
+  /// ☆ Common Elective Credits (共同選修).
+  commonElective('☆'),
+
+  /// ● Dept. Major Required Credits (系專業必修).
+  deptMajorRequired('●'),
+
+  /// ▲ University Major Required Credits (校專業必修).
+  universityMajorRequired('▲'),
+
+  /// ★ Major Elective Credits (專業選修).
+  majorElective('★');
+
+  /// The symbol used on the syllabus page (修 column).
+  final String symbol;
+  const CourseType(this.symbol);
 }

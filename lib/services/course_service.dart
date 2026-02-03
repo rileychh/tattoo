@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
-import 'package:tattoo/models/course.dart' show DayOfWeek, Period;
+import 'package:tattoo/models/course.dart';
 import 'package:tattoo/utils/http.dart';
 import 'package:collection/collection.dart';
 
@@ -92,6 +92,51 @@ typedef CourseDTO = ({
 
   /// Course description in English.
   String? descriptionEn,
+});
+
+/// Syllabus details from the course syllabus page (教學大綱與進度).
+typedef SyllabusDTO = ({
+  // Header table (課程基本資料)
+
+  /// Course type for graduation requirements (修).
+  ///
+  /// More accurate than course table types (必/選/通/輔).
+  /// Uses symbols: ○, △, ☆, ●, ▲, ★
+  CourseType? type,
+
+  /// Number of enrolled students (人).
+  int? enrolled,
+
+  /// Number of withdrawn students (撤).
+  int? withdrawn,
+
+  // Syllabus table (教學大綱與進度)
+
+  /// Instructor's email address.
+  String? email,
+
+  /// Last updated timestamp (最後更新時間).
+  DateTime? lastUpdated,
+
+  /// Course objective/outline (課程大綱).
+  ///
+  /// English page: "Course Objective"
+  String? objective,
+
+  /// Weekly plan (課程進度).
+  ///
+  /// English page: "Course Schedule" - describes weekly topics, not class
+  /// meeting times.
+  String? weeklyPlan,
+
+  /// Evaluation and grading policy (評量方式與標準).
+  String? evaluation,
+
+  /// Textbooks and reference materials (使用教材、參考書目或其他).
+  String? materials,
+
+  /// Additional remarks (備註).
+  String? remarks,
 });
 
 /// Service for accessing NTUT's course selection and catalog system.
@@ -337,23 +382,80 @@ class CourseService {
   /// Fetches the detailed syllabus for a course offering.
   ///
   /// Returns syllabus information including course objectives, textbooks,
-  /// grading policy, and weekly schedule.
+  /// grading policy, and weekly plan.
   ///
-  /// The [courseNumber] should be a course offering number (e.g., "313146"),
-  /// and [id] should be the syllabus ID from the `syllabusId` field of a
+  /// The [courseNumber] should be a course offering number (e.g., "346774"),
+  /// and [syllabusId] should be obtained from the `syllabusId` field of a
   /// [ScheduleDTO].
   ///
-  /// This method is not yet implemented.
-  Future getSyllabus({
+  /// Throws an [Exception] if the syllabus tables are not found.
+  Future<SyllabusDTO> getSyllabus({
     required String courseNumber,
-    required String id,
+    required String syllabusId,
   }) async {
-    await _courseDio.get(
+    final response = await _courseDio.get(
       'ShowSyllabus.jsp',
-      queryParameters: {'snum': courseNumber, 'code': id},
+      queryParameters: {'snum': courseNumber, 'code': syllabusId},
     );
 
-    throw UnimplementedError();
+    final document = parse(response.data);
+    final tables = document.querySelectorAll('table');
+    if (tables.length < 2) {
+      throw Exception('Syllabus tables not found.');
+    }
+
+    // Table 0: Header table (課程基本資料)
+    // Row 1 contains: semester, number, name, phase, credits, hours, type,
+    // instructor, classes, enrolled, withdrawn, remarks
+    final headerRow = tables[0].querySelectorAll('tr')[1];
+    final headerCells = headerRow.querySelectorAll('td');
+
+    final typeSymbol = _parseCellText(headerCells[6]);
+    final type = CourseType.values.firstWhereOrNull(
+      (t) => t.symbol == typeSymbol,
+    );
+    final enrolled = int.tryParse(headerCells[9].text.trim());
+    final withdrawn = int.tryParse(headerCells[10].text.trim());
+
+    // Table 1: Syllabus table (教學大綱與進度)
+    // Rows 0-2: Label and value both in th elements
+    // Rows 3+: Label in th, value in td (some with textarea)
+    final syllabusRows = tables[1].querySelectorAll('tr');
+
+    final email = _parseCellText(syllabusRows[1].querySelectorAll('th')[1]);
+    final lastUpdatedText = _parseCellText(
+      syllabusRows[2].querySelectorAll('th')[1],
+    );
+    final lastUpdated = DateTime.tryParse(lastUpdatedText ?? '');
+
+    // Rows 3-5 have textarea elements for long content
+    final objective = _parseTextareaValue(syllabusRows[3]);
+    final weeklyPlan = _parseTextareaValue(syllabusRows[4]);
+    final evaluation = _parseTextareaValue(syllabusRows[5]);
+    final materials = _parseTextareaValue(syllabusRows[6]);
+
+    final remarksTd = syllabusRows[10].querySelector('td');
+    final remarks = remarksTd != null ? _parseCellText(remarksTd) : null;
+
+    return (
+      type: type,
+      enrolled: enrolled,
+      withdrawn: withdrawn,
+      email: email,
+      lastUpdated: lastUpdated,
+      objective: objective,
+      weeklyPlan: weeklyPlan,
+      evaluation: evaluation,
+      materials: materials,
+      remarks: remarks,
+    );
+  }
+
+  String? _parseTextareaValue(Element row) {
+    final textarea = row.querySelector('textarea');
+    if (textarea == null) return null;
+    final text = textarea.text.trim();
+    return text.isNotEmpty ? text : null;
   }
 
   String? _parseCellText(Element cell) {
