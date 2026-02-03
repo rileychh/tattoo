@@ -86,7 +86,7 @@ void main() {
 
         for (final student in students) {
           expect(student.id, isNotNull, reason: 'Student should have an ID');
-          expect(student.name, isNotNull, reason: 'Student should have a name');
+          // Name can be null for students without a name in the system
         }
       });
 

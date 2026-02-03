@@ -58,7 +58,10 @@ class Students extends Table with AutoIncrementId {
   late final studentId = text().unique()();
 
   /// Student's name.
-  late final name = text()();
+  ///
+  /// Nullable because some students in I-School Plus rosters have no name
+  /// recorded (e.g., student 110440001 in course 292704).
+  late final name = text().nullable()();
 }
 
 /// Academic semester information.
