@@ -85,7 +85,7 @@ class Semesters extends Table with AutoIncrementId {
 /// Represents the permanent course definition independent of semester offerings.
 /// Data is typically fetched from course catalog pages.
 class Courses extends Table with AutoIncrementId, Fetchable {
-  /// Unique course code (e.g., "CS101", "MATH2001").
+  /// Unique course code (e.g., "3004130", "3602012", "AC23502", "1001002").
   late final code = text().unique()();
 
   /// Number of credits awarded for completing this course.
@@ -190,7 +190,10 @@ class CourseOfferings extends Table with AutoIncrementId, Fetchable {
   /// encode the sequence in the name instead (e.g., 英文溝通與應用(一)).
   late final phase = integer()();
 
-  /// Type of course (required/elective/general).
+  /// Course type for graduation credit requirements (課程標準).
+  ///
+  /// Uses symbols from syllabus page: ○, △, ☆, ●, ▲, ★
+  /// See [CourseType] enum for mapping.
   late final courseType = textEnum<CourseType>()();
 
   /// Enrollment status for special cases (e.g., "撤選" for withdrawal).
