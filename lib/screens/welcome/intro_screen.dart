@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:tattoo/screens/welcome/login_screen.dart';
+import 'package:go_router/go_router.dart';
+import 'package:tattoo/router/app_router.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key});
@@ -137,11 +138,7 @@ class _IntroScreenState extends State<IntroScreen>
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                     child: FilledButton(
-                      onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => LoginScreen(),
-                        ),
-                      ),
+                      onPressed: () => context.push(AppRoutes.login),
                       child: Padding(
                         padding: const EdgeInsets.all(6.0),
                         child: const Text('繼續'),
