@@ -439,5 +439,153 @@ void main() {
         }
       });
     });
+
+    group('getTeacher', () {
+      test('should parse teacher profile fields correctly', () async {
+        final semesters = await courseService.getCourseSemesterList(
+          TestCredentials.username,
+        );
+        final semester = semesters.pickRandom();
+        final courseTable = await courseService.getCourseTable(
+          username: TestCredentials.username,
+          semester: semester,
+        );
+
+        // Find a course with a teacher ID
+        final coursesWithTeacher = courseTable
+            .where((schedule) => schedule.teacher?.id != null)
+            .toList();
+
+        expect(
+          coursesWithTeacher,
+          isNotEmpty,
+          reason: 'Should have at least one course with a teacher',
+        );
+
+        final course = coursesWithTeacher.pickRandom();
+        final teacher = await courseService.getTeacher(
+          teacherId: course.teacher!.id!,
+          semester: semester,
+        );
+
+        // Verify profile fields from format=-3
+        expect(
+          teacher.department,
+          isNotNull,
+          reason: 'Teacher should have a department',
+        );
+        expect(
+          teacher.department?.name,
+          isNotEmpty,
+          reason: 'Department name should not be empty',
+        );
+
+        expect(
+          teacher.title,
+          isNotNull,
+          reason: 'Teacher should have a title',
+        );
+        expect(
+          teacher.title,
+          isNotEmpty,
+          reason: 'Title should not be empty',
+        );
+
+        expect(
+          teacher.nameZh,
+          isNotNull,
+          reason: 'Teacher should have a Chinese name',
+        );
+        expect(
+          teacher.nameZh,
+          isNotEmpty,
+          reason: 'Chinese name should not be empty',
+        );
+
+        // Teaching hours should be reasonable (can be 0 for some faculty)
+        if (teacher.teachingHours != null) {
+          expect(
+            teacher.teachingHours,
+            greaterThanOrEqualTo(0),
+            reason: 'Teaching hours should be non-negative',
+          );
+          expect(
+            teacher.teachingHours,
+            lessThanOrEqualTo(40),
+            reason: 'Teaching hours should be reasonable (≤40)',
+          );
+        }
+      });
+
+      test('should parse office hours correctly', () async {
+        final semesters = await courseService.getCourseSemesterList(
+          TestCredentials.username,
+        );
+        final semester = semesters.pickRandom();
+        final courseTable = await courseService.getCourseTable(
+          username: TestCredentials.username,
+          semester: semester,
+        );
+
+        final coursesWithTeacher = courseTable
+            .where((schedule) => schedule.teacher?.id != null)
+            .toList();
+
+        final course = coursesWithTeacher.pickRandom();
+        final teacher = await courseService.getTeacher(
+          teacherId: course.teacher!.id!,
+          semester: semester,
+        );
+
+        // Office hours may or may not be set by teacher
+        if (teacher.officeHours != null && teacher.officeHours!.isNotEmpty) {
+          for (final officeHour in teacher.officeHours!) {
+            // Verify day is valid (guaranteed by type system, but check parsing)
+            expect(
+              officeHour.day,
+              isIn(DayOfWeek.values),
+              reason: 'Day should be a valid DayOfWeek enum',
+            );
+
+            // Verify time ranges are valid
+            expect(
+              officeHour.startTime.hour,
+              inInclusiveRange(0, 23),
+              reason: 'Start hour should be 0-23',
+            );
+            expect(
+              officeHour.startTime.minute,
+              inInclusiveRange(0, 59),
+              reason: 'Start minute should be 0-59',
+            );
+            expect(
+              officeHour.endTime.hour,
+              inInclusiveRange(0, 23),
+              reason: 'End hour should be 0-23',
+            );
+            expect(
+              officeHour.endTime.minute,
+              inInclusiveRange(0, 59),
+              reason: 'End minute should be 0-59',
+            );
+          }
+        }
+
+        // English name from format=-6
+        if (teacher.nameEn != null) {
+          expect(
+            teacher.nameEn,
+            isNotEmpty,
+            reason: 'English name should not be empty if present',
+          );
+          // English name should contain only ASCII letters, spaces, hyphens
+          expect(
+            teacher.nameEn,
+            matches(RegExp(r'^[A-Za-z\s\-]+$')),
+            reason: 'English name should contain only letters, spaces, hyphens',
+          );
+        }
+      });
+    });
   });
 }
