@@ -94,6 +94,42 @@ typedef CourseDTO = ({
   String? descriptionEn,
 });
 
+/// Office hours time slot for a teacher.
+typedef OfficeHourDTO = ({
+  /// Day of week.
+  DayOfWeek day,
+
+  /// Start time as (hour, minute).
+  ({int hour, int minute}) startTime,
+
+  /// End time as (hour, minute).
+  ({int hour, int minute}) endTime,
+});
+
+/// Teacher profile information from the teacher schedule page.
+typedef TeacherDTO = ({
+  /// Reference to the teacher's department.
+  ReferenceDTO? department,
+
+  /// Academic title (e.g., "專任副教授", "兼任講師").
+  String? title,
+
+  /// Teacher's name in Traditional Chinese.
+  String? nameZh,
+
+  /// Teacher's name in English (from office hours page).
+  String? nameEn,
+
+  /// Total teaching hours for the semester.
+  double? teachingHours,
+
+  /// Office hours time slots.
+  List<OfficeHourDTO>? officeHours,
+
+  /// Additional notes about office hours (e.g., appointment requirements).
+  String? officeHoursNote,
+});
+
 /// Syllabus details from the course syllabus page (教學大綱與進度).
 typedef SyllabusDTO = ({
   // Header table (課程基本資料)
@@ -335,25 +371,139 @@ class CourseService {
 
   /// Fetches detailed information about a specific teacher.
   ///
-  /// Returns teacher profile information for the given [teacherId] in a specific
-  /// [semester].
+  /// Returns teacher profile information including department, title, and
+  /// office hours for the given [teacherId] in a specific [semester].
   ///
-  /// This method is not yet implemented.
-  Future getTeacher({
+  /// The [teacherId] should be a teacher code obtained from the `teacher.id`
+  /// field of a [ScheduleDTO].
+  Future<TeacherDTO> getTeacher({
     required String teacherId,
     required SemesterDTO semester,
   }) async {
-    await _courseDio.get(
-      'Teach.jsp',
-      queryParameters: {
-        'format': '-3',
-        'year': semester.year,
-        'sem': semester.semester,
-        'code': teacherId,
-      },
-    );
+    final queryParams = {
+      'year': semester.year,
+      'sem': semester.semester,
+      'code': teacherId,
+    };
 
-    throw UnimplementedError();
+    final (profileResponse, officeHoursResponse) = await (
+      _courseDio.get(
+        'Teach.jsp',
+        queryParameters: {'format': '-3', ...queryParams},
+      ),
+      _courseDio.get(
+        'Teach.jsp',
+        queryParameters: {'format': '-6', ...queryParams},
+      ),
+    ).wait;
+
+    // Parse format=-3: profile header
+    // Structure: <th colspan="24"><a>dept</a> title name hours <a>office hours link</a></th>
+    final profileDoc = parse(profileResponse.data);
+    final headerTh = profileDoc.querySelector('table tr:first-child th');
+
+    ReferenceDTO? department;
+    String? title;
+    String? nameZh;
+    double? teachingHours;
+
+    if (headerTh != null) {
+      final anchors = headerTh.querySelectorAll('a');
+      if (anchors.isNotEmpty) {
+        final deptAnchor = anchors.first;
+        final deptHref = deptAnchor.attributes['href'];
+        final deptCode = deptHref != null
+            ? Uri.parse(deptHref).queryParameters['code']
+            : null;
+        department = (id: deptCode, name: deptAnchor.text.trim());
+      }
+
+      // Parse text segments: "dept  title  name  XX.XX 小時  office hours link"
+      final fullText = headerTh.text.trim();
+      final segments = fullText
+          .split(RegExp(r'\s{2,}'))
+          .where((s) => s.isNotEmpty)
+          .toList();
+
+      if (segments.length >= 4) {
+        title = segments[1];
+        nameZh = segments[2];
+        final hoursMatch = RegExp(r'([\d.]+)\s*小時').firstMatch(segments[3]);
+        teachingHours = hoursMatch != null
+            ? double.tryParse(hoursMatch.group(1)!)
+            : null;
+      }
+    }
+
+    // Parse format=-6: office hours
+    // Structure: plain text with <br> separators
+    final officeDoc = parse(officeHoursResponse.data);
+    final bodyText = officeDoc.body?.text ?? '';
+    final lines = bodyText.split(RegExp(r'\n')).map((l) => l.trim()).toList();
+
+    String? nameEn;
+    final officeHours = <OfficeHourDTO>[];
+    String? officeHoursNote;
+
+    for (final line in lines) {
+      // Parse instructor line: "教師姓名(Instructor)　陸元平(Luh Yuan-Ping)"
+      if (line.contains('Instructor')) {
+        final nameMatch = RegExp(r'\(([A-Za-z\s\-]+)\)$').firstMatch(line);
+        nameEn = nameMatch?.group(1);
+      }
+
+      // Parse office hours: "星期三(Wed)　10:00 ~ 13:00"
+      final hourMatch = RegExp(
+        r'星期[一二三四五六日]\((\w+)\)\s*(\d{1,2}:\d{2})\s*~\s*(\d{1,2}:\d{2})',
+      ).firstMatch(line);
+      if (hourMatch != null) {
+        final dayCode = hourMatch.group(1)!;
+        final day = _parseDayOfWeek(dayCode);
+        final start = _parseTime(hourMatch.group(2)!);
+        final end = _parseTime(hourMatch.group(3)!);
+        if (day != null && start != null && end != null) {
+          officeHours.add((day: day, startTime: start, endTime: end));
+        }
+      }
+
+      // Parse note: "備　註(Note)　..."
+      if (line.contains('Note)')) {
+        final noteMatch = RegExp(r'Note\)\s*(.+)$').firstMatch(line);
+        officeHoursNote = noteMatch?.group(1);
+      }
+    }
+
+    return (
+      department: department,
+      title: title,
+      nameZh: nameZh,
+      nameEn: nameEn,
+      teachingHours: teachingHours,
+      officeHours: officeHours.isNotEmpty ? officeHours : null,
+      officeHoursNote: officeHoursNote,
+    );
+  }
+
+  DayOfWeek? _parseDayOfWeek(String code) {
+    return switch (code.toLowerCase()) {
+      'sun' => DayOfWeek.sunday,
+      'mon' => DayOfWeek.monday,
+      'tue' => DayOfWeek.tuesday,
+      'wed' => DayOfWeek.wednesday,
+      'thu' => DayOfWeek.thursday,
+      'fri' => DayOfWeek.friday,
+      'sat' => DayOfWeek.saturday,
+      _ => null,
+    };
+  }
+
+  ({int hour, int minute})? _parseTime(String time) {
+    final parts = time.split(':');
+    if (parts.length != 2) return null;
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+    if (hour == null || minute == null) return null;
+    return (hour: hour, minute: minute);
   }
 
   /// Fetches detailed information about a specific classroom.
