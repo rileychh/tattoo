@@ -4,7 +4,7 @@ Flutter app for NTUT students: course schedules, scores, enrollment, announcemen
 
 Follow @CONTRIBUTING.md for git operation guidelines.
 
-**Last updated:** 2026-02-02. If stale (>30 days), verify Status section against codebase.
+**Last updated:** 2026-02-04. If stale (>30 days), verify Status section against codebase.
 
 ## Status
 
@@ -17,7 +17,8 @@ Follow @CONTRIBUTING.md for git operation guidelines.
 
 **Todo - Service Layer:**
 - ISchoolPlusService: getCourseAnnouncement, getCourseAnnouncementDetail, courseSubscribe, getCourseSubscribe, getSubscribeNotice
-- CourseService: getDepartmentMap, getCourseCategory (syllabus)
+- CourseService: getDepartmentMap, getCourseCategory
+- CourseService (English): Parse English Course System (`/course/en/`) for English names (courses, teachers, syllabus)
 - StudentQueryService (sa_003_oauth - 學生查詢專區):
   - getStudentStatus (學籍資料查詢)
   - getAcademicPerformance (學業成績查詢)

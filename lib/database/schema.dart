@@ -85,7 +85,7 @@ class Semesters extends Table with AutoIncrementId {
 /// Represents the permanent course definition independent of semester offerings.
 /// Data is typically fetched from course catalog pages.
 class Courses extends Table with AutoIncrementId, Fetchable {
-  /// Unique course code (e.g., "CS101", "MATH2001").
+  /// Unique course code (e.g., "3004130", "3602012", "AC23502", "1001002").
   late final code = text().unique()();
 
   /// Number of credits awarded for completing this course.
@@ -115,8 +115,10 @@ class Teachers extends Table with AutoIncrementId, Fetchable {
   /// Teacher's name in Traditional Chinese.
   late final nameZh = text()();
 
-  // TODO: Add email field (available from syllabus page)
-  // TextColumn get email = text().nullable()();
+  /// Teacher's email address.
+  ///
+  /// Available from syllabus page (教學大綱與進度).
+  late final email = text().nullable()();
 
   // TODO: Add additional teacher details (office, phone, office hours)
 }
@@ -190,7 +192,10 @@ class CourseOfferings extends Table with AutoIncrementId, Fetchable {
   /// encode the sequence in the name instead (e.g., 英文溝通與應用(一)).
   late final phase = integer()();
 
-  /// Type of course (required/elective/general).
+  /// Course type for graduation credit requirements (課程標準).
+  ///
+  /// Uses symbols from syllabus page: ○, △, ☆, ●, ▲, ★
+  /// See [CourseType] enum for mapping.
   late final courseType = textEnum<CourseType>()();
 
   /// Enrollment status for special cases (e.g., "撤選" for withdrawal).
@@ -204,10 +209,34 @@ class CourseOfferings extends Table with AutoIncrementId, Fetchable {
   /// Additional remarks or notes about this offering.
   late final remarks = text().nullable()();
 
+  /// Number of enrolled students (人).
+  late final enrolled = integer().nullable()();
+
+  /// Number of withdrawn students (撤).
+  late final withdrawn = integer().nullable()();
+
+  // Syllabus fields (教學大綱與進度)
+
   /// Syllabus ID for fetching detailed syllabus information.
-  ///
-  /// TODO: Add fields for syllabus details (objectives, textbooks, grading).
   late final syllabusId = text().nullable()();
+
+  /// When the syllabus was last updated (最後更新時間).
+  late final syllabusUpdatedAt = dateTime().nullable()();
+
+  /// Course objective/outline (課程大綱).
+  late final objective = text().nullable()();
+
+  /// Weekly plan describing topics covered each week (課程進度).
+  ///
+  /// Note: Called "Course Schedule" on English page, but refers to weekly
+  /// topics, not class meeting times.
+  late final weeklyPlan = text().nullable()();
+
+  /// Evaluation and grading policy (評量方式與標準).
+  late final evaluation = text().nullable()();
+
+  /// Textbooks and reference materials (使用教材、參考書目或其他).
+  late final textbooks = text().nullable()();
 }
 
 // Junction tables and dependent tables
