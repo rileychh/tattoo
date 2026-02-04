@@ -14,10 +14,11 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final FocusNode _usernameFocusNode = FocusNode();
-  final FocusNode _passwordFocusNode = FocusNode();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _usernameFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
+
   String? _errorMessage;
   bool _usernameHasError = false;
   bool _passwordHasError = false;
@@ -32,97 +33,109 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> _attemptLogin() async {
-    final username = _usernameController.text.trim();
-    final password = _passwordController.text;
-    String? errorMessage;
-    bool usernameHasError = false;
-    bool passwordHasError = false;
+  // State management
 
-    if (username.isEmpty || password.trim().isEmpty) {
-      errorMessage = '請填寫學號與密碼';
-      usernameHasError = username.isEmpty;
-      passwordHasError = password.trim().isEmpty;
-    } else if (username.contains('@') || username.startsWith('t')) {
-      errorMessage = '請直接使用學號登入，不要使用電子郵件';
-      usernameHasError = true;
-    }
-
-    if (errorMessage != null) {
+  void _clearErrors() {
+    if (_errorMessage != null || _usernameHasError || _passwordHasError) {
       setState(() {
-        _errorMessage = errorMessage;
-        _usernameHasError = usernameHasError;
-        _passwordHasError = passwordHasError;
-      });
-      return;
-    }
-
-    setState(() {
-      _errorMessage = null;
-      _usernameHasError = false;
-      _passwordHasError = false;
-      _isLoading = true;
-    });
-
-    FocusScope.of(context).unfocus();
-
-    try {
-      final authRepository = ref.read(authRepositoryProvider);
-      await authRepository.login(username, password);
-
-      if (!mounted) return;
-      context.go(AppRoutes.home);
-    } catch (_) {
-      if (!mounted) return;
-      setState(() {
-        _errorMessage = '登入失敗，請確認帳號密碼';
-        _usernameHasError = true;
-        _passwordHasError = true;
-        _isLoading = false;
+        _errorMessage = null;
+        _usernameHasError = false;
+        _passwordHasError = false;
       });
     }
   }
 
+  void _setError(
+    String message, {
+    bool username = false,
+    bool password = false,
+  }) {
+    setState(() {
+      _errorMessage = message;
+      _usernameHasError = username;
+      _passwordHasError = password;
+      _isLoading = false;
+    });
+  }
+
+  void _setLoading(bool loading) {
+    setState(() {
+      _isLoading = loading;
+      if (loading) {
+        _errorMessage = null;
+        _usernameHasError = false;
+        _passwordHasError = false;
+      }
+    });
+  }
+
+  // Actions
+
+  Future<void> _attemptLogin() async {
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text;
+
+    // Validate input
+    if (username.isEmpty || password.trim().isEmpty) {
+      _setError(
+        '請填寫學號與密碼',
+        username: username.isEmpty,
+        password: password.trim().isEmpty,
+      );
+      return;
+    }
+    if (username.contains('@') || username.startsWith('t')) {
+      _setError('請直接使用學號登入，不要使用電子郵件', username: true);
+      return;
+    }
+
+    _setLoading(true);
+    FocusScope.of(context).unfocus();
+
+    try {
+      await ref.read(authRepositoryProvider).login(username, password);
+      if (mounted) context.go(AppRoutes.home);
+    } catch (_) {
+      if (mounted) _setError('登入失敗，請確認帳號密碼', username: true, password: true);
+    }
+  }
+
+  // UI helpers
+
+  InputDecoration _inputDecoration(String hintText, {bool hasError = false}) {
+    final theme = Theme.of(context);
+    final surfaceColor = theme.colorScheme.surfaceContainerHighest;
+    final errorColor = theme.colorScheme.error;
+    final primaryColor = theme.colorScheme.primary;
+
+    return InputDecoration(
+      hintText: hintText,
+      hintStyle: TextStyle(
+        color: theme.textTheme.bodyMedium?.color?.withAlpha(150),
+        fontWeight: FontWeight.w500,
+      ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(50)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(50),
+        borderSide: BorderSide(color: hasError ? errorColor : surfaceColor),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(50),
+        borderSide: BorderSide(
+          color: hasError ? errorColor : primaryColor,
+          width: 2,
+        ),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      filled: true,
+      fillColor: surfaceColor,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
-
-    // A helper function to style login fields
-    loginDecoration(String hintText, {bool hasError = false}) {
-      final surfaceColor = Theme.of(
-        context,
-      ).colorScheme.surfaceContainerHighest;
-      final errorColor = Theme.of(context).colorScheme.error;
-      return InputDecoration(
-        hintText: hintText,
-        hintStyle: TextStyle(
-          color: Theme.of(context).textTheme.bodyMedium?.color?.withAlpha(150),
-          fontWeight: FontWeight.w500,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(50),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(50),
-          borderSide: BorderSide(color: hasError ? errorColor : surfaceColor),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(50),
-          borderSide: BorderSide(
-            color: hasError
-                ? errorColor
-                : Theme.of(context).colorScheme.primary,
-            width: 2,
-          ),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 24,
-          vertical: 16,
-        ),
-        filled: true,
-        fillColor: surfaceColor,
-      );
-    }
+    final theme = Theme.of(context);
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: SafeArea(
@@ -133,9 +146,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               onTap: () => FocusScope.of(context).unfocus(),
               child: SingleChildScrollView(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Center(
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -143,64 +154,54 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         mainAxisSize: MainAxisSize.min,
                         spacing: 24,
                         children: [
-                          // welcome title
-                          RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                              style: TextStyle(
-                                fontSize: 48,
-                                fontWeight: FontWeight.w800,
-                                color: Theme.of(
-                                  context,
-                                ).textTheme.bodyLarge?.color,
-                              ),
+                          // Welcome title
+                          Text.rich(
+                            TextSpan(
+                              text: '歡迎加入\n',
                               children: [
-                                const TextSpan(text: '歡迎加入'),
-                                const TextSpan(text: '\n'),
                                 TextSpan(
                                   text: '北科生活',
                                   style: TextStyle(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary,
+                                    color: theme.colorScheme.primary,
                                   ),
                                 ),
                               ],
                             ),
+                            style: TextStyle(
+                              fontSize: 48,
+                              fontWeight: FontWeight.w800,
+                              color: theme.textTheme.bodyLarge?.color,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
 
-                          // login instruction
-                          RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                    fontSize: 16,
-                                    height: 1.6,
-                                    color: Colors.grey[600],
-                                  ),
+                          // Login instruction
+                          Text.rich(
+                            TextSpan(
+                              text: '請使用',
                               children: [
-                                const TextSpan(text: '請使用'),
                                 TextSpan(
                                   text: '北科校園入口網站',
                                   style: const TextStyle(
                                     decoration: TextDecoration.underline,
                                   ),
                                   recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      launchUrl(
-                                        Uri.parse(
-                                          'https://nportal.ntut.edu.tw',
-                                        ),
-                                      );
-                                    },
+                                    ..onTap = () => launchUrl(
+                                      Uri.parse('https://nportal.ntut.edu.tw'),
+                                    ),
                                 ),
                                 const TextSpan(text: '的帳號密碼登入。'),
                               ],
                             ),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontSize: 16,
+                              height: 1.6,
+                              color: Colors.grey[600],
+                            ),
+                            textAlign: TextAlign.center,
                           ),
 
-                          // login form
+                          // Login form
                           AutofillGroup(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -211,78 +212,52 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   focusNode: _usernameFocusNode,
                                   maxLines: 1,
                                   enabled: !_isLoading,
-                                  decoration: loginDecoration(
+                                  decoration: _inputDecoration(
                                     '學號',
                                     hasError: _usernameHasError,
                                   ),
-                                  autofillHints: const [
-                                    AutofillHints.username,
-                                  ],
+                                  autofillHints: const [AutofillHints.username],
                                   textInputAction: TextInputAction.next,
-                                  onSubmitted: (_) {
-                                    _passwordFocusNode.requestFocus();
-                                  },
-                                  onChanged: (_) {
-                                    if (_errorMessage != null ||
-                                        _usernameHasError ||
-                                        _passwordHasError) {
-                                      setState(() {
-                                        _errorMessage = null;
-                                        _usernameHasError = false;
-                                        _passwordHasError = false;
-                                      });
-                                    }
-                                  },
+                                  onSubmitted: (_) =>
+                                      _passwordFocusNode.requestFocus(),
+                                  onChanged: (_) => _clearErrors(),
                                 ),
                                 TextField(
                                   controller: _passwordController,
                                   focusNode: _passwordFocusNode,
                                   maxLines: 1,
                                   enabled: !_isLoading,
-                                  decoration: loginDecoration(
+                                  decoration: _inputDecoration(
                                     '密碼',
                                     hasError: _passwordHasError,
                                   ),
-                                  autofillHints: const [
-                                    AutofillHints.password,
-                                  ],
+                                  autofillHints: const [AutofillHints.password],
                                   obscureText: true,
                                   textInputAction: TextInputAction.done,
                                   onSubmitted: (_) => _attemptLogin(),
-                                  onChanged: (_) {
-                                    if (_errorMessage != null ||
-                                        _usernameHasError ||
-                                        _passwordHasError) {
-                                      setState(() {
-                                        _errorMessage = null;
-                                        _usernameHasError = false;
-                                        _passwordHasError = false;
-                                      });
-                                    }
-                                  },
+                                  onChanged: (_) => _clearErrors(),
                                 ),
                               ],
                             ),
                           ),
 
+                          // Error message
                           if (_errorMessage != null)
                             Text(
                               _errorMessage!,
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                color: Theme.of(context).colorScheme.error,
+                                color: theme.colorScheme.error,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
 
-                          // login button
+                          // Login button
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.primary,
+                                backgroundColor: theme.colorScheme.primary,
                                 foregroundColor: Colors.white,
                               ),
                               onPressed: _isLoading ? null : _attemptLogin,
@@ -302,7 +277,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ),
 
-                          // terms of privacy
+                          // Privacy notice
                           Column(
                             spacing: 8.0,
                             children: [
@@ -311,36 +286,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 size: screenHeight * 0.03,
                                 color: Colors.grey[600],
                               ),
-                              RichText(
-                                textAlign: TextAlign.center,
-                                text: TextSpan(
-                                  style: Theme.of(context).textTheme.bodySmall
-                                      ?.copyWith(
-                                        height: 1.6,
-                                        color: Colors.grey[600],
-                                      ),
+                              Text.rich(
+                                TextSpan(
+                                  text: '登入資訊將被安全地儲存在您的裝置中\n登入即表示您同意我們的',
                                   children: [
-                                    const TextSpan(
-                                      text: '登入資訊將被安全地儲存在您的裝置中',
-                                    ),
-                                    const TextSpan(text: '\n'),
-                                    const TextSpan(text: '登入即表示您同意我們的'),
                                     TextSpan(
                                       text: '隱私條款',
                                       style: const TextStyle(
                                         decoration: TextDecoration.underline,
                                       ),
                                       recognizer: TapGestureRecognizer()
-                                        ..onTap = () {
-                                          launchUrl(
-                                            Uri.parse(
-                                              'https://example.com/terms-of-service',
-                                            ),
-                                          );
-                                        },
+                                        ..onTap = () => launchUrl(
+                                          Uri.parse(
+                                            'https://example.com/terms-of-service',
+                                          ),
+                                        ),
                                     ),
                                   ],
                                 ),
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  height: 1.6,
+                                  color: Colors.grey[600],
+                                ),
+                                textAlign: TextAlign.center,
                               ),
                             ],
                           ),
