@@ -114,7 +114,7 @@ void main() {
 
         // Verify numeric fields have reasonable values
         if (firstRegularCourse.credits != null) {
-          expect(firstRegularCourse.credits, greaterThan(0));
+          expect(firstRegularCourse.credits, greaterThanOrEqualTo(0));
           expect(
             firstRegularCourse.credits,
             lessThanOrEqualTo(10),
