@@ -1,17 +1,19 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:tattoo/screens/main/home_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:tattoo/services/portal_service.dart';
+import 'package:tattoo/repositories/auth_repository.dart';
+import 'package:tattoo/router/app_router.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode _usernameFocusNode = FocusNode();
@@ -19,7 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _errorMessage;
   bool _usernameHasError = false;
   bool _passwordHasError = false;
-  final _portalClient = PortalService();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -30,20 +32,12 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future<UserDTO> _login() async {
-    return _portalClient.login(
-      _usernameController.text.trim(),
-      _passwordController.text,
-    );
-  }
-
   Future<void> _attemptLogin() async {
     final username = _usernameController.text.trim();
     final password = _passwordController.text;
     String? errorMessage;
     bool usernameHasError = false;
     bool passwordHasError = false;
-    UserDTO? user;
 
     if (username.isEmpty || password.trim().isEmpty) {
       errorMessage = '請填寫學號與密碼';
@@ -54,28 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
       usernameHasError = true;
     }
 
-    if (errorMessage == null) {
-      setState(() {
-        _errorMessage = null;
-        _usernameHasError = false;
-        _passwordHasError = false;
-      });
-
-      FocusScope.of(context).unfocus();
-
-      try {
-        user = await _login();
-        if (user.name == null) throw Exception('Simulated login failure');
-      } catch (_) {
-        errorMessage = '登入失敗，請確認帳號密碼';
-        usernameHasError = true;
-        passwordHasError = true;
-      }
-    }
-
-    if (!mounted) return;
-
-    if (errorMessage != null || user == null) {
+    if (errorMessage != null) {
       setState(() {
         _errorMessage = errorMessage;
         _usernameHasError = usernameHasError;
@@ -84,15 +57,30 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    final UserDTO loggedInUser = user;
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (_) => HomeScreen(
-          username: username,
-          user: loggedInUser,
-        ),
-      ),
-    );
+    setState(() {
+      _errorMessage = null;
+      _usernameHasError = false;
+      _passwordHasError = false;
+      _isLoading = true;
+    });
+
+    FocusScope.of(context).unfocus();
+
+    try {
+      final authRepository = ref.read(authRepositoryProvider);
+      await authRepository.login(username, password);
+
+      if (!mounted) return;
+      context.go(AppRoutes.home);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _errorMessage = '登入失敗，請確認帳號密碼';
+        _usernameHasError = true;
+        _passwordHasError = true;
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -222,6 +210,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   controller: _usernameController,
                                   focusNode: _usernameFocusNode,
                                   maxLines: 1,
+                                  enabled: !_isLoading,
                                   decoration: loginDecoration(
                                     '學號',
                                     hasError: _usernameHasError,
@@ -249,6 +238,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   controller: _passwordController,
                                   focusNode: _passwordFocusNode,
                                   maxLines: 1,
+                                  enabled: !_isLoading,
                                   decoration: loginDecoration(
                                     '密碼',
                                     hasError: _passwordHasError,
@@ -295,10 +285,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ).colorScheme.primary,
                                 foregroundColor: Colors.white,
                               ),
-                              onPressed: _attemptLogin,
+                              onPressed: _isLoading ? null : _attemptLogin,
                               child: Padding(
                                 padding: const EdgeInsets.all(6.0),
-                                child: const Text('登入'),
+                                child: _isLoading
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : const Text('登入'),
                               ),
                             ),
                           ),
